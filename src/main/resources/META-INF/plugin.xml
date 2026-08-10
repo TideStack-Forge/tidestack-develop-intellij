@@ -1,0 +1,84 @@
+<idea-plugin>
+    <id>tidestack.develop</id>
+    <name>TideStack Develop</name>
+    <vendor>TideStack</vendor>
+
+    <description><![CDATA[
+    IntelliJ IDEA integration for editing TideStack metadata files and TideStack develop configuration.
+
+    Features:
+    - Graphical metadata editor for JSON metadata files
+    - Built-in new metadata file templates
+    - New metadata directory convention (*.menu.json, *.authority.json, *.dev-menu.json, *.ui-model.json, *.ui-schema.json, app-modules.json, configuration.json, configuration-groups.json)
+    - Legacy resources/META-INF/ouroboros metadata convention
+    - TideStack Develop Config project binding
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="tidestack-develop-jcef.xml">com.intellij.modules.jcef</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+    <depends>com.intellij.gradle</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Configuration -->
+        <projectConfigurable
+            parentId="tools"
+            instance="com.ouroboros.idea.settings.OuroborosConfigurable"
+            id="com.ouroboros.idea.settings.OuroborosConfigurable"
+            displayName="TideStack Develop Config"/>
+
+        <!-- Notification Group -->
+        <notificationGroup id="TideStack" displayType="BALLOON"/>
+
+    </extensions>
+
+    <actions>
+        <group id="tidestack.develop.metadata.NewMetadataFileGroup"
+               text="TideStack Metadata"
+               popup="true">
+            <add-to-group group-id="NewGroup" anchor="last"/>
+            <action id="tidestack.develop.metadata.NewAuthorityMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewAuthorityMetadataFileAction"
+                    text="权限项模型"
+                    description="Create a TideStack authority metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewMenuMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewMenuMetadataFileAction"
+                    text="菜单模型"
+                    description="Create a TideStack menu metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewDevMenuMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewDevMenuMetadataFileAction"
+                    text="开发菜单模型"
+                    description="Create a TideStack development menu metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewUiModelMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewUiModelMetadataFileAction"
+                    text="UI 模型"
+                    description="Create a TideStack UI model metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewUiSchemaMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewUiSchemaMetadataFileAction"
+                    text="UI Schema"
+                    description="Create a TideStack UI schema metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewAppModuleMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewAppModuleMetadataFileAction"
+                    text="应用模块"
+                    description="Create a TideStack app module metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewConfigurationMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewConfigurationMetadataFileAction"
+                    text="配置项"
+                    description="Create a TideStack configuration metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewConfigurationGroupMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewConfigurationGroupMetadataFileAction"
+                    text="配置分组"
+                    description="Create a TideStack configuration group metadata JSON file"/>
+        </group>
+
+        <!-- Toolbar Actions -->
+        <action id="com.ouroboros.idea.actions.DeployAndDebugAction"
+                class="com.ouroboros.idea.actions.DeployAndDebugAction"
+                text="Deploy &amp; Debug"
+                description="Deploy to the TideStack development platform and start remote debugging"
+                icon="AllIcons.Actions.Execute">
+            <add-to-group group-id="ToolbarRunGroup" anchor="after" relative-to-action="RunConfiguration"/>
+        </action>
+    </actions>
+</idea-plugin>
