@@ -10,18 +10,26 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
+import com.ouroboros.idea.TideStackMessages
 
 abstract class NewTypedMetadataFileAction(
     private val metadataType: String
 ) : AnAction(), DumbAware {
     override fun update(e: AnActionEvent) {
         e.presentation.isEnabledAndVisible = e.project != null && hasTargetDirectory(e)
+        MetadataContributionRegistry.byType(metadataType)
+            ?.let(TideStackMessages::localizeContribution)
+            ?.let { contribution ->
+                e.presentation.text = contribution.displayName
+            }
     }
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         val targetDirectory = targetDirectory(e) ?: return
-        val contribution = MetadataContributionRegistry.byType(metadataType) ?: return
+        val contribution = MetadataContributionRegistry.byType(metadataType)
+            ?.let(TideStackMessages::localizeContribution)
+            ?: return
         val creationRoot = creationRootDirectory(targetDirectory, contribution)
         val defaultPath = MetadataFileTemplateService.defaultInputPath(creationRoot.path, contribution)
         val dialog = NewMetadataFileDialog(project, contribution, creationRoot, defaultPath)
@@ -32,7 +40,11 @@ abstract class NewTypedMetadataFileAction(
         val result = dialog.result() ?: return
         val relativePath = result.relativePath
         if (creationRoot.findFileByRelativePath(relativePath) != null) {
-            Messages.showErrorDialog(project, "TideStack metadata file already exists: $relativePath", "File Exists")
+            Messages.showErrorDialog(
+                project,
+                TideStackMessages.message("metadata.error.fileExists", mapOf("targetPath" to relativePath)),
+                "File Exists"
+            )
             return
         }
 

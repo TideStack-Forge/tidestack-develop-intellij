@@ -4,14 +4,66 @@
     <vendor>TideStack</vendor>
 
     <description><![CDATA[
-    IntelliJ IDEA integration for editing TideStack metadata files and TideStack develop configuration.
+        <p>
+            <strong>TideStack Develop</strong> connects IntelliJ IDEA with the TideStack development platform.
+            It helps developers edit TideStack metadata visually, bind local projects to a development platform,
+            and run deploy-and-debug workflows from inside the IDE.
+        </p>
 
-    Features:
-    - Graphical metadata editor for JSON metadata files
-    - Built-in new metadata file templates
-    - New metadata directory convention (*.menu.json, *.authority.json, *.dev-menu.json, *.ui-model.json, *.ui-schema.json, app-modules.json, configuration.json, configuration-groups.json)
-    - Legacy resources/META-INF/ouroboros metadata convention
-    - TideStack Develop Config project binding
+        <h2>Highlights</h2>
+        <ul>
+            <li>Visual editors for TideStack JSON metadata files.</li>
+            <li>Dedicated UI Schema visual editor powered by the shared AMIS editor runtime.</li>
+            <li>Support for the new <code>src/main/metadata</code> convention.</li>
+            <li>Compatibility with legacy <code>resources/META-INF/ouroboros</code> metadata paths.</li>
+            <li>Built-in metadata file templates from the IDE's New menu.</li>
+            <li>Project-level TideStack Develop Config for platform binding.</li>
+            <li>One-click Deploy &amp; Debug for Java extension projects.</li>
+        </ul>
+
+        <h2>Metadata Editing</h2>
+        <p>
+            TideStack Develop opens a visual editing tab for supported JSON metadata files while keeping
+            the normal source editor available. It supports common TideStack metadata types including:
+        </p>
+        <ul>
+            <li>Authority metadata</li>
+            <li>Menu and development menu metadata</li>
+            <li>UI model metadata</li>
+            <li>UI Schema metadata</li>
+            <li>Application modules</li>
+            <li>Configuration and configuration groups</li>
+        </ul>
+
+        <h2>File Conventions</h2>
+        <p>
+            The plugin supports both the new filename-based convention and the legacy resource directory convention.
+            New projects can place metadata under <code>src/main/metadata</code> using files such as
+            <code>*.menu.json</code>, <code>*.authority.json</code>, <code>*.ui-model.json</code>,
+            <code>*.ui-schema.json</code>, <code>app-modules.json</code>, <code>configuration.json</code>,
+            and <code>configuration-groups.json</code>.
+        </p>
+
+        <h2>TideStack Develop Config</h2>
+        <p>
+            The configuration UI helps bind a local project to a TideStack development platform.
+            Shared project settings such as the development server URL and application name can be stored
+            in the project, while private local values such as the dev key remain in a local-only file.
+        </p>
+
+        <h2>Deploy &amp; Debug</h2>
+        <p>
+            For Java extension projects, TideStack Develop can build the project, locate the generated JAR,
+            upload it to the development platform, restart the target container, create a remote debug session,
+            and attach IntelliJ IDEA's Remote JVM Debug configuration automatically.
+        </p>
+
+        <h2>Requirements</h2>
+        <ul>
+            <li>IntelliJ IDEA 2023.1 or later.</li>
+            <li>Java 17 or later for plugin execution and project builds.</li>
+            <li>A TideStack development platform with the required development APIs enabled.</li>
+        </ul>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>

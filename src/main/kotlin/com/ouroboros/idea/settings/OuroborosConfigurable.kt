@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.Messages
 import com.intellij.ui.dsl.builder.*
+import com.ouroboros.idea.TideStackMessages
 import com.ouroboros.idea.services.OuroborosApiService
 import java.io.File
 import javax.swing.JComponent
@@ -23,51 +24,51 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
     private var appName: String = ""
     private var devKey: String = ""
 
-    override fun getDisplayName(): String = "TideStack Develop Config"
+    override fun getDisplayName(): String = TideStackMessages.message("settings.displayName")
 
     override fun createComponent(): JComponent {
         reloadFields()
 
         panel = panel {
-            group("Project Shared Config") {
-                row("Development Server URL:") {
+            group(TideStackMessages.message("settings.projectSharedConfig")) {
+                row(TideStackMessages.message("settings.developmentServerUrl")) {
                     textField()
                         .bindText(::developmentServerUrl)
                         .columns(40)
-                        .comment("Saved in ${TideStackDevelopConfigService.PROJECT_CONFIG_RELATIVE_PATH}")
+                        .comment(TideStackMessages.message("settings.developmentServerUrl.comment", mapOf("path" to TideStackDevelopConfigService.PROJECT_CONFIG_RELATIVE_PATH)))
                 }
-                row("Application Name:") {
+                row(TideStackMessages.message("settings.appName")) {
                     textField()
                         .bindText(::appName)
                         .columns(40)
-                        .comment("Application name in the TideStack development server")
+                        .comment(TideStackMessages.message("settings.appName.comment"))
                 }
             }
 
-            group("Local Private Config") {
-                row("Dev Key:") {
+            group(TideStackMessages.message("settings.localPrivateConfig")) {
+                row(TideStackMessages.message("settings.devKey")) {
                     passwordField()
                         .bindText(::devKey)
                         .columns(40)
-                        .comment("Saved in ${TideStackDevelopConfigService.LOCAL_CONFIG_RELATIVE_PATH}; profile and container are resolved from this key")
+                        .comment(TideStackMessages.message("settings.devKey.comment", mapOf("path" to TideStackDevelopConfigService.LOCAL_CONFIG_RELATIVE_PATH)))
                 }
             }
 
-            group("Quick Actions") {
+            group(TideStackMessages.message("settings.quickActions")) {
                 row {
-                    button("Import from File") {
+                    button(TideStackMessages.message("settings.importFromFile")) {
                         importFromFile()
-                    }.comment("Import a platform-generated JSON config and split it into shared/local files")
+                    }.comment(TideStackMessages.message("settings.importFromFile.comment"))
                 }
                 row {
-                    button("Test Connection") {
+                    button(TideStackMessages.message("settings.testConnection")) {
                         testConnection()
-                    }.comment("Verify the development server is reachable")
+                    }.comment(TideStackMessages.message("settings.testConnection.comment"))
                 }
                 row {
-                    button("Resolve Develop Target") {
+                    button(TideStackMessages.message("settings.resolveDevelopTarget")) {
                         resolveDevelopTarget()
-                    }.comment("Use the dev key to resolve profile and target container")
+                    }.comment(TideStackMessages.message("settings.resolveDevelopTarget.comment"))
                 }
             }
         }
@@ -86,8 +87,8 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
 
     private fun importFromFile() {
         val descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor("json")
-        descriptor.title = "Select TideStack Develop Config File"
-        descriptor.description = "Select the JSON config file downloaded from TideStack"
+        descriptor.title = TideStackMessages.message("settings.selectConfigFileTitle")
+        descriptor.description = TideStackMessages.message("settings.selectConfigFileDescription")
 
         val virtualFile = FileChooser.chooseFile(descriptor, project, null) ?: return
         try {
@@ -105,15 +106,19 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
             panel?.reset()
 
             Messages.showInfoMessage(
-                "Configuration imported successfully.\n\n" +
-                    "Shared: ${configService.projectConfigPath().getOrNull()}\n" +
-                    "Local: ${configService.localConfigPath().getOrNull()}",
-                "Import Successful"
+                TideStackMessages.message(
+                    "settings.importSuccessMessage",
+                    mapOf(
+                        "projectPath" to configService.projectConfigPath().getOrNull(),
+                        "localPath" to configService.localConfigPath().getOrNull()
+                    )
+                ),
+                TideStackMessages.message("settings.importSuccessTitle")
             )
         } catch (e: Exception) {
             Messages.showErrorDialog(
-                "Failed to import configuration: ${e.message}",
-                "Import Failed"
+                TideStackMessages.message("settings.importFailedMessage", mapOf("message" to e.message)),
+                TideStackMessages.message("settings.importFailedTitle")
             )
         }
     }
@@ -122,17 +127,23 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
         panel?.apply()
         val config = currentConfig()
         if (config.developmentServerUrl.isBlank()) {
-            Messages.showWarningDialog("Please configure Development Server URL first", "Missing Configuration")
+            Messages.showWarningDialog(
+                TideStackMessages.message("settings.missingServerUrl"),
+                TideStackMessages.message("settings.missingConfigTitle")
+            )
             return
         }
 
         val result = apiService.testConnection(config)
         if (result.isSuccess) {
-            Messages.showInfoMessage("Connection successful. The development server is reachable.", "Test Connection")
+            Messages.showInfoMessage(
+                TideStackMessages.message("settings.connectionSuccessMessage"),
+                TideStackMessages.message("settings.connectionSuccessTitle")
+            )
         } else {
             Messages.showErrorDialog(
-                "Connection failed: ${result.exceptionOrNull()?.message}",
-                "Test Connection"
+                TideStackMessages.message("settings.connectionFailedMessage", mapOf("message" to result.exceptionOrNull()?.message)),
+                TideStackMessages.message("settings.connectionFailedTitle")
             )
         }
     }
@@ -142,8 +153,8 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
         val config = currentConfig()
         if (config.developmentServerUrl.isBlank() || config.appName.isBlank() || config.devKey.isBlank()) {
             Messages.showWarningDialog(
-                "Please configure Development Server URL, Application Name, and Dev Key first",
-                "Missing Configuration"
+                TideStackMessages.message("settings.missingRequiredConfig"),
+                TideStackMessages.message("settings.missingConfigTitle")
             )
             return
         }
@@ -151,19 +162,24 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
         val result = apiService.resolveDevelopTarget(config)
         if (result.isFailure) {
             Messages.showErrorDialog(
-                "Failed to resolve develop target: ${result.exceptionOrNull()?.message}",
-                "Resolve Failed"
+                TideStackMessages.message("settings.resolveFailedMessage", mapOf("message" to result.exceptionOrNull()?.message)),
+                TideStackMessages.message("settings.resolveFailedTitle")
             )
             return
         }
 
         val target = result.getOrThrow()
         Messages.showInfoMessage(
-            "Resolved develop target:\n\n" +
-                "Profile: ${target.profileId}\n" +
-                "Container: ${target.containerName} (${target.containerId})\n" +
-                "Status: ${target.containerStatus}",
-            "Develop Target"
+            TideStackMessages.message(
+                "settings.resolveTargetMessage",
+                mapOf(
+                    "profileId" to target.profileId,
+                    "containerName" to target.containerName,
+                    "containerId" to target.containerId,
+                    "containerStatus" to target.containerStatus
+                )
+            ),
+            TideStackMessages.message("settings.resolveTargetTitle")
         )
     }
 
@@ -174,7 +190,7 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
     override fun apply() {
         panel?.apply()
         saveFields().onFailure {
-            throw ConfigurationException(it.message ?: "Failed to save TideStack Develop Config")
+            throw ConfigurationException(it.message ?: TideStackMessages.message("settings.failedSave"))
         }
     }
 

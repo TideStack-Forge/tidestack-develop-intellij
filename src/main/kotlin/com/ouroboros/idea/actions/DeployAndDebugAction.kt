@@ -6,6 +6,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
+import com.ouroboros.idea.TideStackMessages
 import com.ouroboros.idea.services.BuildService
 import com.ouroboros.idea.services.NotificationService
 import com.ouroboros.idea.services.OuroborosApiService
@@ -16,12 +17,17 @@ import kotlinx.coroutines.runBlocking
 
 class DeployAndDebugAction : AnAction() {
 
+    override fun update(e: AnActionEvent) {
+        e.presentation.text = TideStackMessages.message("deploy.action")
+        e.presentation.description = TideStackMessages.message("deploy.action.description")
+    }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         val notificationService = project.service<NotificationService>()
         val configResult = project.service<TideStackDevelopConfigService>().loadEffectiveConfig()
         if (configResult.isFailure) {
-            notificationService.showError("TideStack Develop Config is invalid: ${configResult.exceptionOrNull()?.message}")
+            notificationService.showError(TideStackMessages.message("deploy.configInvalid", mapOf("message" to configResult.exceptionOrNull()?.message)))
             return
         }
         val config = configResult.getOrThrow()
@@ -30,66 +36,66 @@ class DeployAndDebugAction : AnAction() {
             return
         }
 
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Deploy and Debug", true) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, TideStackMessages.message("deploy.task"), true) {
             override fun run(indicator: ProgressIndicator) {
                 val buildService = project.service<BuildService>()
                 val apiService = project.service<OuroborosApiService>()
                 val debugService = project.service<RemoteDebugService>()
 
                 try {
-                    indicator.text = "Resolving TideStack develop target..."
+                    indicator.text = TideStackMessages.message("deploy.resolveTarget")
                     val targetResult = apiService.resolveDevelopTarget(config)
                     if (targetResult.isFailure) {
-                        notificationService.showError("Develop target resolution failed: ${targetResult.exceptionOrNull()?.message}")
+                        notificationService.showError(TideStackMessages.message("deploy.resolveTargetFailed", mapOf("message" to targetResult.exceptionOrNull()?.message)))
                         return
                     }
                     val target = targetResult.getOrThrow()
-                    notificationService.showInfo("Develop target resolved: ${target.profileId}/${target.containerName}")
+                    notificationService.showInfo(TideStackMessages.message("deploy.targetResolved", mapOf("profileId" to target.profileId, "containerName" to target.containerName)))
 
-                    indicator.text = "Building project..."
+                    indicator.text = TideStackMessages.message("deploy.buildProject")
                     val jarResult = runBlocking { buildService.buildProject() }
                     if (jarResult.isFailure) {
-                        notificationService.showError("Build failed: ${jarResult.exceptionOrNull()?.message}")
+                        notificationService.showError(TideStackMessages.message("deploy.buildFailed", mapOf("message" to jarResult.exceptionOrNull()?.message)))
                         return
                     }
                     val jarFile = jarResult.getOrThrow()
-                    notificationService.showInfo("Build completed: ${jarFile.name}")
+                    notificationService.showInfo(TideStackMessages.message("deploy.buildCompleted", mapOf("fileName" to jarFile.name)))
 
-                    indicator.text = "Uploading jar file..."
+                    indicator.text = TideStackMessages.message("deploy.uploadJar")
                     val uploadResult = apiService.uploadJar(jarFile, config)
                     if (uploadResult.isFailure) {
-                        notificationService.showError("Upload failed: ${uploadResult.exceptionOrNull()?.message}")
+                        notificationService.showError(TideStackMessages.message("deploy.uploadFailed", mapOf("message" to uploadResult.exceptionOrNull()?.message)))
                         return
                     }
-                    notificationService.showInfo("Upload successful")
+                    notificationService.showInfo(TideStackMessages.message("deploy.uploadSuccess"))
 
-                    indicator.text = "Restarting container..."
+                    indicator.text = TideStackMessages.message("deploy.restartContainer")
                     val restartResult = apiService.restartContainer(target.containerId, config)
                     if (restartResult.isFailure) {
-                        notificationService.showError("Restart failed: ${restartResult.exceptionOrNull()?.message}")
+                        notificationService.showError(TideStackMessages.message("deploy.restartFailed", mapOf("message" to restartResult.exceptionOrNull()?.message)))
                         return
                     }
-                    notificationService.showInfo("Container restarted")
+                    notificationService.showInfo(TideStackMessages.message("deploy.containerRestarted"))
 
-                    indicator.text = "Creating debug session..."
+                    indicator.text = TideStackMessages.message("deploy.createDebugSession")
                     val sessionResult = apiService.createDebugSession(config, target)
                     if (sessionResult.isFailure) {
-                        notificationService.showError("Debug session creation failed: ${sessionResult.exceptionOrNull()?.message}")
+                        notificationService.showError(TideStackMessages.message("deploy.createDebugSessionFailed", mapOf("message" to sessionResult.exceptionOrNull()?.message)))
                         return
                     }
                     val session = sessionResult.getOrThrow()
-                    notificationService.showInfo("Debug session created: ${session.host}:${session.port}")
+                    notificationService.showInfo(TideStackMessages.message("deploy.debugSessionCreated", mapOf("host" to session.host, "port" to session.port)))
 
-                    indicator.text = "Attaching debugger..."
+                    indicator.text = TideStackMessages.message("deploy.attachDebugger")
                     val attachResult = debugService.createAndAttachDebugConfiguration(session.host, session.port)
                     if (attachResult.isFailure) {
-                        notificationService.showError("Debugger attach failed: ${attachResult.exceptionOrNull()?.message}")
+                        notificationService.showError(TideStackMessages.message("deploy.attachDebuggerFailed", mapOf("message" to attachResult.exceptionOrNull()?.message)))
                         return
                     }
 
-                    notificationService.showSuccess("Deploy and debug completed successfully!")
+                    notificationService.showSuccess(TideStackMessages.message("deploy.completed"))
                 } catch (e: Exception) {
-                    notificationService.showError("Unexpected error: ${e.message}")
+                    notificationService.showError(TideStackMessages.message("deploy.unexpectedError", mapOf("message" to e.message)))
                 }
             }
         })
@@ -99,15 +105,15 @@ class DeployAndDebugAction : AnAction() {
         val notificationService = project.service<NotificationService>()
 
         if (config.developmentServerUrl.isBlank()) {
-            notificationService.showWarning("Development Server URL is not configured")
+            notificationService.showWarning(TideStackMessages.message("deploy.missingServerUrl"))
             return false
         }
         if (config.appName.isBlank()) {
-            notificationService.showWarning("Application Name is not configured")
+            notificationService.showWarning(TideStackMessages.message("deploy.missingAppName"))
             return false
         }
         if (config.devKey.isBlank()) {
-            notificationService.showWarning("Dev Key is not configured")
+            notificationService.showWarning(TideStackMessages.message("deploy.missingDevKey"))
             return false
         }
 

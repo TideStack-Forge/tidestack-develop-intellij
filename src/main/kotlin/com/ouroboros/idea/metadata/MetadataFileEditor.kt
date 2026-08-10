@@ -22,6 +22,7 @@ import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
 import com.intellij.util.ui.UIUtil
+import com.ouroboros.idea.TideStackMessages
 import java.awt.BorderLayout
 import java.beans.PropertyChangeListener
 import java.beans.PropertyChangeSupport
@@ -69,6 +70,7 @@ class MetadataFileEditor(
                     metadataType = metadataType,
                     initialDocumentJson = toBrowserDocumentJson(text, document),
                     initialTheme = currentAmisTheme(),
+                    locale = TideStackMessages.currentLocale(),
                     saveScript = save.inject(
                         "JSON.stringify({text: text, revision: revision})",
                         "function(response) { resolve(JSON.parse(response)); }",

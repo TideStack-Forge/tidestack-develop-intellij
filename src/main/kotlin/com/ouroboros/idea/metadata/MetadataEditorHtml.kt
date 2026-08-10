@@ -7,6 +7,7 @@ object MetadataEditorHtml {
         metadataType: String,
         initialDocumentJson: String,
         initialTheme: String,
+        locale: String,
         saveScript: String,
         readyScript: String
     ): String {
@@ -14,13 +15,14 @@ object MetadataEditorHtml {
             const logicalHost = window.OuroborosMetadataEditorHostCore.createBrowserMetadataEditorHost({
               uri: ${escapeScriptString(uri)},
               metadataType: ${escapeScriptString(metadataType)},
+              locale: ${escapeScriptString(locale)},
               initialDocument: ${escapeScriptJson(initialDocumentJson)},
               saveText: (text, revision) => new Promise((resolve, reject) => { $saveScript })
             });
             window.OuroborosMetadataEditorHost = {
               initialize: () => logicalHost.loadState(),
               theme: ${escapeScriptString(initialTheme)},
-              locale: 'zh-CN',
+              locale: ${escapeScriptString(locale)},
               amisEditorDragFallback: true,
               transport: {
                 saveText: (text, revision) => logicalHost.saveText(text, revision),

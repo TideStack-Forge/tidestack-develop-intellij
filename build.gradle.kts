@@ -12,6 +12,7 @@ val metadataEditorCommonDir = file("common/amis-schema")
 val metadataHostRuntime = file("common/amis-schema/dist/browser/metadata-editor-host.js")
 val metadataContributionManifest = file("common/amis-schema/src/metadataTypeContributions.json")
 val tideStackDevelopConfigContract = file("common/contracts/tidestack-develop-config.json")
+val tideStackI18nDir = file("common/amis-schema/src/i18n")
 val amisSdkDir = file("common/amis-sdk")
 val requiredMetadataEditorAssets = listOf(
     metadataRuntimeDir.resolve("metadata-editor-runtime.js"),
@@ -21,6 +22,8 @@ val requiredMetadataEditorAssets = listOf(
     metadataHostRuntime,
     metadataContributionManifest,
     tideStackDevelopConfigContract,
+    tideStackI18nDir.resolve("zh-CN.json"),
+    tideStackI18nDir.resolve("en-US.json"),
     amisSdkDir.resolve("sdk.js"),
     amisSdkDir.resolve("sdk.css"),
     amisSdkDir.resolve("cxd.css"),
@@ -110,6 +113,9 @@ tasks {
         }
         from(tideStackDevelopConfigContract) {
             into("ouroboros-ide-contracts")
+        }
+        from(tideStackI18nDir) {
+            into("tidestack-develop-i18n")
         }
         from(amisSdkDir) {
             into("ouroboros-metadata-editor/amis-sdk")

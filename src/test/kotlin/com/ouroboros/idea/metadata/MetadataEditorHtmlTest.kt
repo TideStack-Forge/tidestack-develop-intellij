@@ -23,6 +23,7 @@ class MetadataEditorHtmlTest {
             metadataType = "menu",
             initialDocumentJson = "{\"text\":\"{}\",\"revision\":\"7\"}",
             initialTheme = "dark",
+            locale = "en-US",
             saveScript = "resolve({revision: '8'});",
             readyScript = "window.__ready = true;"
         )
@@ -32,6 +33,7 @@ class MetadataEditorHtmlTest {
         assertTrue(html.contains("id=\"metadata-amis-theme-cxd\""))
         assertTrue(html.contains("id=\"metadata-amis-theme-dark\""))
         assertTrue(html.contains("theme: \"dark\""))
+        assertTrue(html.contains("locale: \"en-US\""))
         assertFalse(html.contains("metadata-json"))
         assertFalse(html.contains("metadata-save"))
         assertFalse(html.contains("metadata-validate"))

@@ -5,6 +5,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import com.ouroboros.idea.TideStackMessages
 
 data class MetadataFileTemplatePath(
     val path: String? = null,
@@ -57,25 +58,38 @@ object MetadataFileTemplateService {
         }
             .trim('/')
         if (trimmed.isEmpty()) {
-            return MetadataFileTemplatePath(error = "Enter a metadata file path.")
+            return MetadataFileTemplatePath(error = TideStackMessages.message("metadata.error.enterPath"))
         }
 
         if (contribution.fixedFileName != null) {
             val path = if (selectedMetadataDirectory || trimmed.contains('/')) trimmed else "$SOURCE_ROOT/$trimmed"
             val expectedPath = if (selectedMetadataDirectory) contribution.fixedFileName else "$SOURCE_ROOT/${contribution.fixedFileName}"
             if (baseName(path) != contribution.fixedFileName || path != expectedPath) {
-                return MetadataFileTemplatePath(error = "${contribution.displayName} must be $SOURCE_ROOT/${contribution.fixedFileName}.")
+                return MetadataFileTemplatePath(
+                    error = TideStackMessages.message(
+                        "metadata.error.fixedFilePath",
+                        mapOf(
+                            "displayName" to contribution.displayName,
+                            "fixedFileName" to contribution.fixedFileName
+                        )
+                    )
+                )
             }
             return MetadataFileTemplatePath(path = path)
         }
 
         val fileSuffix = contribution.fileSuffix
-            ?: return MetadataFileTemplatePath(error = "This metadata type has no file template.")
+            ?: return MetadataFileTemplatePath(error = TideStackMessages.message("metadata.error.noTemplate"))
         val defaultFileName = contribution.fileTemplate?.defaultFileName ?: "metadata$fileSuffix"
         val filePath = if (directoryInput) "$trimmed/$defaultFileName" else trimmed
         val withSuffix = if (filePath.endsWith(".json")) filePath else "$filePath$fileSuffix"
         if (!withSuffix.endsWith(fileSuffix)) {
-            return MetadataFileTemplatePath(error = "${contribution.displayName} files must end with $fileSuffix.")
+            return MetadataFileTemplatePath(
+                error = TideStackMessages.message(
+                    "metadata.error.fileSuffix",
+                    mapOf("displayName" to contribution.displayName, "fileSuffix" to fileSuffix)
+                )
+            )
         }
         return MetadataFileTemplatePath(path = if (selectedMetadataDirectory || withSuffix.startsWith("$SOURCE_ROOT/")) withSuffix else "$SOURCE_ROOT/$withSuffix")
     }

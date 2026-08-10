@@ -11,6 +11,7 @@ import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
+import com.ouroboros.idea.TideStackMessages
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.GridBagConstraints
@@ -38,7 +39,7 @@ class NewMetadataFileDialog(
     private var applyingPathDefaults = false
 
     init {
-        title = "New ${contribution.displayName}"
+        title = TideStackMessages.message("metadata.new.dialogTitle", mapOf("displayName" to contribution.displayName))
         createTemplateFieldInputs(defaultPath)
         pathField.document.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
@@ -60,7 +61,7 @@ class NewMetadataFileDialog(
         val form = JPanel(GridBagLayout())
         form.border = JBUI.Borders.empty(8)
         var row = 0
-        addFormRow(form, row++, "文件路径", pathField)
+        addFormRow(form, row++, TideStackMessages.message("metadata.new.filePathLabel"), pathField)
         templateFields.forEach { field ->
             addFormRow(form, row++, field.label, fieldComponent(field), field.labelRemark)
         }
@@ -78,14 +79,21 @@ class NewMetadataFileDialog(
         if (normalized.error != null) {
             return ValidationInfo(normalized.error, pathField)
         }
-        val relativePath = normalized.path ?: return ValidationInfo("Enter a metadata file path.", pathField)
+        val relativePath = normalized.path
+            ?: return ValidationInfo(TideStackMessages.message("metadata.error.enterPath"), pathField)
         if (creationRoot.findFileByRelativePath(relativePath) != null) {
-            return ValidationInfo("TideStack metadata file already exists: $relativePath", pathField)
+            return ValidationInfo(
+                TideStackMessages.message("metadata.error.fileExists", mapOf("targetPath" to relativePath)),
+                pathField
+            )
         }
         templateFields.forEach { field ->
             val input = fieldInputs[field.name]
             if (field.required && input?.text?.trim().isNullOrEmpty()) {
-                return ValidationInfo("${field.label} is required.", input)
+                return ValidationInfo(
+                    TideStackMessages.message("metadata.error.fieldRequired", mapOf("label" to field.label)),
+                    input
+                )
             }
         }
         return null
