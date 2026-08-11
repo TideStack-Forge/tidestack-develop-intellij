@@ -8,7 +8,10 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.ouroboros.idea.TideStackMessages
 
@@ -18,9 +21,8 @@ abstract class NewTypedMetadataFileAction(
     override fun update(e: AnActionEvent) {
         e.presentation.isEnabledAndVisible = e.project != null && hasTargetDirectory(e)
         MetadataContributionRegistry.byType(metadataType)
-            ?.let(TideStackMessages::localizeContribution)
             ?.let { contribution ->
-                e.presentation.text = contribution.displayName
+                e.presentation.text = TideStackMessages.actionText("metadata.type.${contribution.type}.command")
             }
     }
 
@@ -30,19 +32,28 @@ abstract class NewTypedMetadataFileAction(
         val contribution = MetadataContributionRegistry.byType(metadataType)
             ?.let(TideStackMessages::localizeContribution)
             ?: return
-        val creationRoot = creationRootDirectory(targetDirectory, contribution)
-        val defaultPath = MetadataFileTemplateService.defaultInputPath(creationRoot.path, contribution)
-        val dialog = NewMetadataFileDialog(project, contribution, creationRoot, defaultPath)
+        val creationRoot = creationRootDirectory(project, targetDirectory)
+        val selectedDirectoryPath = selectedDirectoryPath(creationRoot, targetDirectory)
+        val creationModel = MetadataFileTemplateService.creationFlowModel(selectedDirectoryPath, contribution)
+        val dialog = NewMetadataFileDialog(project, contribution, creationRoot, creationModel)
         if (!dialog.showAndGet()) {
             return
         }
 
         val result = dialog.result() ?: return
-        val relativePath = result.relativePath
-        if (creationRoot.findFileByRelativePath(relativePath) != null) {
+        val creationPlan = MetadataFileTemplateService.creationPlan(
+            contribution,
+            result.relativePath,
+            creationModel,
+            result.templateValues
+        ).getOrElse { error ->
+            Messages.showErrorDialog(project, error.message, TideStackMessages.message("metadata.new.dialogTitle", mapOf("displayName" to contribution.displayName)))
+            return
+        }
+        if (creationRoot.findFileByRelativePath(creationPlan.relativePath) != null) {
             Messages.showErrorDialog(
                 project,
-                TideStackMessages.message("metadata.error.fileExists", mapOf("targetPath" to relativePath)),
+                TideStackMessages.message("metadata.error.fileExists", mapOf("targetPath" to creationPlan.relativePath)),
                 "File Exists"
             )
             return
@@ -51,8 +62,8 @@ abstract class NewTypedMetadataFileAction(
         val createdFile = createMetadataFile(
             project,
             creationRoot,
-            relativePath,
-            MetadataFileTemplateService.templateText(contribution, result.templateValues)
+            creationPlan.relativePath,
+            creationPlan.text
         )
         FileEditorManager.getInstance(project).openFile(createdFile, true)
     }
@@ -91,24 +102,27 @@ abstract class NewTypedMetadataFileAction(
         return e.getData(LangDataKeys.IDE_VIEW) != null || e.getData(CommonDataKeys.VIRTUAL_FILE) != null
     }
 
-    private fun creationRootDirectory(targetDirectory: VirtualFile, contribution: MetadataContributionDefinition): VirtualFile {
-        if (contribution.fixedFileName == null) {
-            return targetDirectory
-        }
-        return metadataSourceRootDirectory(targetDirectory) ?: targetDirectory
+    private fun creationRootDirectory(project: Project, targetDirectory: VirtualFile): VirtualFile {
+        return metadataModuleRootDirectory(targetDirectory)
+            ?: ProjectFileIndex.getInstance(project).getContentRootForFile(targetDirectory)
+            ?: project.basePath?.let { LocalFileSystem.getInstance().findFileByPath(it) }
+            ?: targetDirectory
     }
 
-    private fun metadataSourceRootDirectory(directory: VirtualFile): VirtualFile? {
+    private fun metadataModuleRootDirectory(directory: VirtualFile): VirtualFile? {
         var current: VirtualFile? = directory
         while (current != null) {
             val parent = current.parent
-            val grandParent = parent?.parent
-            if (current.name == "metadata" && parent?.name == "main" && grandParent?.name == "src") {
-                return current
+            if (current.name == "main" && parent?.name == "src") {
+                return parent.parent
             }
             current = parent
         }
         return null
+    }
+
+    private fun selectedDirectoryPath(rootDirectory: VirtualFile, targetDirectory: VirtualFile): String {
+        return VfsUtilCore.getRelativePath(targetDirectory, rootDirectory, '/')?.trim('/').orEmpty()
     }
 
     private fun targetDirectory(e: AnActionEvent): VirtualFile? {

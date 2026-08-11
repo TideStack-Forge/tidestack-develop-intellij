@@ -30,17 +30,18 @@ class NewMetadataFileDialog(
     project: Project,
     private val contribution: MetadataContributionDefinition,
     private val creationRoot: VirtualFile,
-    defaultPath: String
+    private val creationModel: MetadataFileCreationFlowModel
 ) : DialogWrapper(project) {
-    private val pathField = JBTextField(defaultPath)
-    private val templateFields = contribution.fileTemplate?.fields.orEmpty()
+    private val pathField = JBTextField(creationModel.defaultPathInput)
+    private val templateFields = MetadataFileTemplateService.fieldModels(contribution, creationModel.defaultPath)
     private val fieldInputs = linkedMapOf<String, JTextComponent>()
     private val editedFields = mutableSetOf<String>()
     private var applyingPathDefaults = false
 
     init {
         title = TideStackMessages.message("metadata.new.dialogTitle", mapOf("displayName" to contribution.displayName))
-        createTemplateFieldInputs(defaultPath)
+        pathField.isEditable = !creationModel.pathInputLocked
+        createTemplateFieldInputs(creationModel.defaultPath)
         pathField.document.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
                 applyPathDefaultsToUntouchedFields()
@@ -72,7 +73,11 @@ class NewMetadataFileDialog(
         }
     }
 
-    override fun getPreferredFocusedComponent(): JComponent = pathField
+    override fun getPreferredFocusedComponent(): JComponent = if (creationModel.pathInputLocked) {
+        fieldInputs.values.firstOrNull() ?: pathField
+    } else {
+        pathField
+    }
 
     override fun doValidate(): ValidationInfo? {
         val normalized = normalizedPath()
@@ -89,9 +94,10 @@ class NewMetadataFileDialog(
         }
         templateFields.forEach { field ->
             val input = fieldInputs[field.name]
-            if (field.required && input?.text?.trim().isNullOrEmpty()) {
+            val error = MetadataFileTemplateService.validateField(field, input?.text.orEmpty())
+            if (error != null) {
                 return ValidationInfo(
-                    TideStackMessages.message("metadata.error.fieldRequired", mapOf("label" to field.label)),
+                    error,
                     input
                 )
             }
@@ -103,9 +109,10 @@ class NewMetadataFileDialog(
         val normalizedDefaultPath = MetadataFileTemplateService.normalizeInputPath(
             defaultPath,
             contribution,
-            creationRoot.path
+            creationModel
         ).path ?: defaultPath
-        val defaults = MetadataFileTemplateService.defaultTemplateFieldValues(contribution, normalizedDefaultPath)
+        val defaults = MetadataFileTemplateService.fieldModels(contribution, normalizedDefaultPath)
+            .associate { field -> field.name to field.defaultValue }
         templateFields.forEach { field ->
             val input = createTemplateFieldInput(field, defaults[field.name].orEmpty())
             input.document.addDocumentListener(object : DocumentAdapter() {
@@ -120,7 +127,7 @@ class NewMetadataFileDialog(
     }
 
     private fun createTemplateFieldInput(
-        field: MetadataFileTemplateFieldDefinition,
+        field: MetadataFileCreationFieldModel,
         defaultValue: String
     ): JTextComponent {
         if (field.name == "description") {
@@ -132,7 +139,7 @@ class NewMetadataFileDialog(
         return JBTextField(defaultValue)
     }
 
-    private fun fieldComponent(field: MetadataFileTemplateFieldDefinition): JComponent {
+    private fun fieldComponent(field: MetadataFileCreationFieldModel): JComponent {
         val input = fieldInputs.getValue(field.name)
         if (input is JBTextArea) {
             return JBScrollPane(input).apply {
@@ -179,7 +186,8 @@ class NewMetadataFileDialog(
 
     private fun applyPathDefaultsToUntouchedFields() {
         val relativePath = normalizedPath().path ?: return
-        val defaults = MetadataFileTemplateService.defaultTemplateFieldValues(contribution, relativePath)
+        val defaults = MetadataFileTemplateService.fieldModels(contribution, relativePath)
+            .associate { field -> field.name to field.defaultValue }
         applyingPathDefaults = true
         try {
             templateFields.forEach { field ->
@@ -193,6 +201,6 @@ class NewMetadataFileDialog(
     }
 
     private fun normalizedPath(): MetadataFileTemplatePath {
-        return MetadataFileTemplateService.normalizeInputPath(pathField.text, contribution, creationRoot.path)
+        return MetadataFileTemplateService.normalizeInputPath(pathField.text, contribution, creationModel)
     }
 }

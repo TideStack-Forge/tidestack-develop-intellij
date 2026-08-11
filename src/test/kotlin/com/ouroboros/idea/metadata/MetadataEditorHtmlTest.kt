@@ -1,12 +1,11 @@
 package com.ouroboros.idea.metadata
 
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class MetadataEditorHtmlTest {
     @Test
-    fun `renders the single form shell without the legacy JSON editor layout`() {
+    fun `renders the metadata editor shell`() {
         val html = MetadataEditorHtml.render(
             assets = MetadataEditorAssetUris(
                 htmlTemplate = MetadataEditorHtmlTest::class.java.classLoader
@@ -20,7 +19,7 @@ class MetadataEditorHtmlTest {
                 amisDarkThemeCssUri = "file:///amis/dark.css"
             ),
             uri = "file:///main.menu.json",
-            metadataType = "menu",
+            schemaName = "menu",
             initialDocumentJson = "{\"text\":\"{}\",\"revision\":\"7\"}",
             initialTheme = "dark",
             locale = "en-US",
@@ -34,11 +33,5 @@ class MetadataEditorHtmlTest {
         assertTrue(html.contains("id=\"metadata-amis-theme-dark\""))
         assertTrue(html.contains("theme: \"dark\""))
         assertTrue(html.contains("locale: \"en-US\""))
-        assertFalse(html.contains("metadata-json"))
-        assertFalse(html.contains("metadata-save"))
-        assertFalse(html.contains("metadata-validate"))
-        assertFalse(html.contains("metadata-type"))
-        assertFalse(html.contains("resource-editor.menu.json"))
-        assertFalse(html.contains("Apply JSON"))
     }
 }

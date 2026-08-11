@@ -8,62 +8,58 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
 abstract class TypedMetadataFileEditorProvider(
-    private val metadataType: String,
-    private val editorTypeId: String
+    private val metadataType: String
 ) : FileEditorProvider, DumbAware {
+    private val registration: MetadataEditorRegistrationDefinition by lazy {
+        MetadataEditorRegistry.byMetadataType(metadataType)
+            ?: error("Missing metadata editor registration for type: $metadataType")
+    }
+
     override fun accept(project: Project, file: VirtualFile): Boolean {
         return acceptsPath(file.path)
     }
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        return MetadataFileEditor(project, file, metadataType)
+        return MetadataFileEditor(project, file, registration.schemaName)
     }
 
-    override fun getEditorTypeId(): String = editorTypeId
+    override fun getEditorTypeId(): String = registration.intellijEditorTypeId
 
     override fun getPolicy(): FileEditorPolicy = FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR
 
     internal fun acceptsPath(path: String): Boolean {
-        return MetadataFileMatcher.match(path)?.type == metadataType
+        return MetadataEditorRegistry.match(path)?.metadataType == metadataType
     }
 }
 
 class AuthorityMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "authority",
-    editorTypeId = "ouroboros.metadata.editor.authority"
+    metadataType = "authority"
 )
 
 class MenuMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "menu",
-    editorTypeId = "ouroboros.metadata.editor.menu"
+    metadataType = "menu"
 )
 
 class DevMenuMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "dev-menu",
-    editorTypeId = "ouroboros.metadata.editor.devMenu"
+    metadataType = "dev-menu"
 )
 
 class UiModelMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "ui-model",
-    editorTypeId = "ouroboros.metadata.editor.uiModel"
+    metadataType = "ui-model"
 )
 
 class UiSchemaMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "ui-schema",
-    editorTypeId = "ouroboros.metadata.editor.uiSchema"
+    metadataType = "ui-schema"
 )
 
 class AppModuleMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "app-module",
-    editorTypeId = "ouroboros.metadata.editor.appModule"
+    metadataType = "app-module"
 )
 
 class ConfigurationMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "configuration",
-    editorTypeId = "ouroboros.metadata.editor.configuration"
+    metadataType = "configuration"
 )
 
 class ConfigurationGroupMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
-    metadataType = "configuration-group",
-    editorTypeId = "ouroboros.metadata.editor.configurationGroup"
+    metadataType = "configuration-group"
 )

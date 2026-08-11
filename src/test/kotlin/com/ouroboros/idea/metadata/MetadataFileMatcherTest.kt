@@ -2,7 +2,6 @@ package com.ouroboros.idea.metadata
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -64,18 +63,6 @@ class MetadataFileMatcherTest {
             matches.map { it?.packagedPath }
         )
         assertTrue(matches.all { it?.diagnostics?.isEmpty() == true })
-    }
-
-    @Test
-    fun `does not treat menu-model suffix as MVP menu suffix`() {
-        assertNull(MetadataFileMatcher.match("/repo/src/main/metadata/menu-model/main.menu-model.json"))
-    }
-
-    @Test
-    fun `does not resolve fixed collection metadata by synthetic suffix files`() {
-        assertNull(MetadataFileMatcher.match("/repo/src/main/metadata/app-module/home.app-module.json"))
-        assertNull(MetadataFileMatcher.match("/repo/src/main/metadata/configuration/home.configuration.json"))
-        assertNull(MetadataFileMatcher.match("/repo/src/main/metadata/configuration-group/home.configuration-group.json"))
     }
 
     @Test

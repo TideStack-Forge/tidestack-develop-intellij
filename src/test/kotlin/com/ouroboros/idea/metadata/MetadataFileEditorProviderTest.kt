@@ -25,6 +25,23 @@ class MetadataFileEditorProviderTest {
         assertEquals("ouroboros.metadata.editor.appModule", appModule.editorTypeId)
         assertEquals("ouroboros.metadata.editor.configuration", configuration.editorTypeId)
         assertEquals("ouroboros.metadata.editor.configurationGroup", configurationGroup.editorTypeId)
+        assertEquals(
+            listOf(
+                "authority",
+                "menu",
+                "dev-menu",
+                "ui-model",
+                "ui-schema",
+                "app-module",
+                "configuration",
+                "configuration-group"
+            ),
+            MetadataEditorRegistry.all.map { it.metadataType }
+        )
+        assertEquals(
+            listOf("*.ui-schema.json", "**/resources/META-INF/ouroboros/ui-schema/**/*.json"),
+            MetadataEditorRegistry.byMetadataType("ui-schema")?.fileMatchPatterns
+        )
     }
 
     @Test

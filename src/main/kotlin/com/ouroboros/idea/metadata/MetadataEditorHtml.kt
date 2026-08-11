@@ -4,7 +4,7 @@ object MetadataEditorHtml {
     fun render(
         assets: MetadataEditorAssetUris,
         uri: String,
-        metadataType: String,
+        schemaName: String,
         initialDocumentJson: String,
         initialTheme: String,
         locale: String,
@@ -14,7 +14,7 @@ object MetadataEditorHtml {
         val hostScript = """
             const logicalHost = window.OuroborosMetadataEditorHostCore.createBrowserMetadataEditorHost({
               uri: ${escapeScriptString(uri)},
-              metadataType: ${escapeScriptString(metadataType)},
+              metadataType: ${escapeScriptString(schemaName)},
               locale: ${escapeScriptString(locale)},
               initialDocument: ${escapeScriptJson(initialDocumentJson)},
               saveText: (text, revision) => new Promise((resolve, reject) => { $saveScript })
@@ -50,7 +50,7 @@ object MetadataEditorHtml {
                 ?.let { "<link rel=\"stylesheet\" href=\"${escapeAttr(it)}\" />" }
                 .orEmpty(),
             "{{RUNTIME_SCRIPT_URI}}" to escapeAttr(assets.runtimeScriptUri),
-            "{{AMIS_EDITOR_RUNTIME_SCRIPT_TAG}}" to if (metadataType == "ui-schema") {
+            "{{AMIS_EDITOR_RUNTIME_SCRIPT_TAG}}" to if (schemaName == "ui-schema") {
                 assets.amisEditorRuntimeScriptUri
                     ?.let { "<script src=\"${escapeAttr(it)}\"></script>" }
                     .orEmpty()

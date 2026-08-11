@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.9.0"
@@ -5,31 +7,29 @@ plugins {
 }
 
 group = "com.ouroboros"
-version = "0.1.0"
+version = "0.1.2"
 
-val metadataRuntimeDir = file("common/amis-schema/runtime")
-val metadataEditorCommonDir = file("common/amis-schema")
-val metadataHostRuntime = file("common/amis-schema/dist/browser/metadata-editor-host.js")
-val metadataContributionManifest = file("common/amis-schema/src/metadataTypeContributions.json")
-val tideStackDevelopConfigContract = file("common/contracts/tidestack-develop-config.json")
-val tideStackI18nDir = file("common/amis-schema/src/i18n")
+val metadataRuntimeDir = file("common/metadata-editor-runtime/runtime")
+val metadataEditorRuntimeDir = file("common/metadata-editor-runtime")
+val metadataEditorSchemaDir = file("common/metadata-editor-schema")
+val metadataEditorAssetManifest = metadataEditorSchemaDir.resolve("metadataEditorAssets.json")
+val metadataEditorAssets = JsonSlurper().parse(metadataEditorAssetManifest) as Map<*, *>
+val metadataHostRuntime = file("common/metadata-editor-runtime/dist/browser/metadata-editor-host.js")
+val tideStackI18nDir = file("common/metadata-editor-schema/dist/i18n")
 val amisSdkDir = file("common/amis-sdk")
+fun metadataEditorAssetList(key: String): List<String> {
+    return (metadataEditorAssets[key] as? List<*>)?.map { it.toString() } ?: emptyList()
+}
+
+val metadataRuntimeAssets = metadataEditorAssetList("runtimeFiles").map(metadataEditorRuntimeDir::resolve)
+val metadataSchemaAssets = metadataEditorAssetList("schemaFiles").map { file("common/metadata-editor-schema/dist/$it") }
+val tideStackDevelopConfigContracts = metadataEditorAssetList("contractFiles").map { file("common/contracts/$it") }
+val tideStackI18nAssets = metadataEditorAssetList("i18nFiles").map(tideStackI18nDir::resolve)
+val amisSdkRequiredAssets = metadataEditorAssetList("amisSdkRequiredFiles").map(amisSdkDir::resolve)
 val requiredMetadataEditorAssets = listOf(
-    metadataRuntimeDir.resolve("metadata-editor-runtime.js"),
-    metadataRuntimeDir.resolve("metadata-editor-webview.html"),
-    metadataRuntimeDir.resolve("metadata-editor-amis-editor.js"),
-    metadataRuntimeDir.resolve("metadata-editor-amis-editor.css"),
     metadataHostRuntime,
-    metadataContributionManifest,
-    tideStackDevelopConfigContract,
-    tideStackI18nDir.resolve("zh-CN.json"),
-    tideStackI18nDir.resolve("en-US.json"),
-    amisSdkDir.resolve("sdk.js"),
-    amisSdkDir.resolve("sdk.css"),
-    amisSdkDir.resolve("cxd.css"),
-    amisSdkDir.resolve("dark.css"),
     amisSdkDir.resolve("thirds/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2")
-)
+) + metadataRuntimeAssets + metadataSchemaAssets + tideStackDevelopConfigContracts + tideStackI18nAssets + amisSdkRequiredAssets
 
 repositories {
     mavenCentral()
@@ -52,19 +52,24 @@ intellij {
 
 tasks {
     val buildMetadataEditorCommon by registering(Exec::class) {
-        workingDir(metadataEditorCommonDir)
+        workingDir(metadataEditorRuntimeDir)
         commandLine("npm", "run", "build")
-        inputs.files(fileTree(metadataEditorCommonDir) {
+        inputs.files(fileTree(metadataEditorRuntimeDir) {
             include("src/**", "package.json", "tsconfig*.json", "vite.browser-host.config.ts")
         })
+        inputs.files(fileTree(metadataEditorSchemaDir) {
+            include("metadata-types/**", "metadata-editors/**", "i18n/**", "tidestackDevelopCapabilities.json", "package.json", "scripts/**")
+            include("metadataCreationContract.json", "metadataCreationCases.json", "metadataEditorAssets.json")
+        })
         outputs.file(metadataHostRuntime)
+        outputs.files(metadataSchemaAssets)
     }
 
     val verifyMetadataEditorAssets by registering {
         inputs.files(requiredMetadataEditorAssets)
         doLast {
             val cssAssetPattern = Regex("url\\([\"']?([^\"')]+)[\"']?\\)")
-            val cssReferencedAssets = listOf("sdk.css", "cxd.css", "dark.css").flatMap { cssName ->
+            val cssReferencedAssets = metadataEditorAssetList("amisSdkCssFilesWithReferencedAssets").flatMap { cssName ->
                 val cssFile = amisSdkDir.resolve(cssName)
                 if (!cssFile.isFile) {
                     emptyList()
@@ -108,11 +113,15 @@ tasks {
         from(metadataHostRuntime) {
             into("ouroboros-metadata-editor/runtime")
         }
-        from(metadataContributionManifest) {
-            into("ouroboros-metadata-editor")
+        metadataSchemaAssets.forEach { asset ->
+            from(asset) {
+                into("ouroboros-metadata-editor")
+            }
         }
-        from(tideStackDevelopConfigContract) {
-            into("ouroboros-ide-contracts")
+        tideStackDevelopConfigContracts.forEach { asset ->
+            from(asset) {
+                into("ouroboros-ide-contracts")
+            }
         }
         from(tideStackI18nDir) {
             into("tidestack-develop-i18n")

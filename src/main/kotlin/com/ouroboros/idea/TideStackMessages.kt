@@ -35,6 +35,10 @@ object TideStackMessages {
         return format(template, data)
     }
 
+    fun actionText(key: String): String {
+        return message(key).removeSuffix("...")
+    }
+
     fun localize(value: String?): String? {
         if (value == null) {
             return null

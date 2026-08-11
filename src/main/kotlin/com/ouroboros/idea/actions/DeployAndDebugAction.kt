@@ -102,21 +102,28 @@ class DeployAndDebugAction : AnAction() {
     }
 
     private fun validateConfig(config: TideStackDevelopConfig, project: com.intellij.openapi.project.Project): Boolean {
-        val notificationService = project.service<NotificationService>()
-
         if (config.developmentServerUrl.isBlank()) {
-            notificationService.showWarning(TideStackMessages.message("deploy.missingServerUrl"))
+            showMissingConfigWarning(project, TideStackMessages.message("deploy.missingServerUrl"))
             return false
         }
         if (config.appName.isBlank()) {
-            notificationService.showWarning(TideStackMessages.message("deploy.missingAppName"))
+            showMissingConfigWarning(project, TideStackMessages.message("deploy.missingAppName"))
             return false
         }
         if (config.devKey.isBlank()) {
-            notificationService.showWarning(TideStackMessages.message("deploy.missingDevKey"))
+            showMissingConfigWarning(project, TideStackMessages.message("deploy.missingDevKey"))
             return false
         }
 
         return true
+    }
+
+    private fun showMissingConfigWarning(project: com.intellij.openapi.project.Project, message: String) {
+        project.service<NotificationService>().showWarning(
+            message,
+            TideStackMessages.message("settings.configureProjectAction")
+        ) {
+            ConfigureProjectAction.openConfig(project)
+        }
     }
 }

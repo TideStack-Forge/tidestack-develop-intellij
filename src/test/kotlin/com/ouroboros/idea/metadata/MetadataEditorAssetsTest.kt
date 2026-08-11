@@ -51,7 +51,7 @@ class MetadataEditorAssetsTest {
             repoHint = tempDir.toString()
         )
 
-        assertTrue(uris.runtimeScriptUri.endsWith("/common/amis-schema/runtime/metadata-editor-runtime.js"))
+        assertTrue(uris.runtimeScriptUri.endsWith("/common/metadata-editor-runtime/runtime/metadata-editor-runtime.js"))
         assertTrue(uris.amisSdkScriptUri.endsWith("/common/amis-sdk/sdk.js"))
         assertTrue(uris.amisDarkThemeCssUri.endsWith("/common/amis-sdk/dark.css"))
     }
@@ -89,11 +89,11 @@ class MetadataEditorAssetsTest {
     }
 
     private fun writeDevelopmentAssets(root: Path) {
-        write(root.resolve("common/amis-schema/runtime/metadata-editor-runtime.js"))
-        write(root.resolve("common/amis-schema/runtime/metadata-editor-webview.html"))
-        write(root.resolve("common/amis-schema/runtime/metadata-editor-amis-editor.js"))
-        write(root.resolve("common/amis-schema/runtime/metadata-editor-amis-editor.css"))
-        write(root.resolve("common/amis-schema/dist/browser/metadata-editor-host.js"))
+        write(root.resolve("common/metadata-editor-runtime/runtime/metadata-editor-runtime.js"))
+        write(root.resolve("common/metadata-editor-runtime/runtime/metadata-editor-webview.html"))
+        write(root.resolve("common/metadata-editor-runtime/runtime/metadata-editor-amis-editor.js"))
+        write(root.resolve("common/metadata-editor-runtime/runtime/metadata-editor-amis-editor.css"))
+        write(root.resolve("common/metadata-editor-runtime/dist/browser/metadata-editor-host.js"))
         write(root.resolve("common/amis-sdk/sdk.js"))
         write(root.resolve("common/amis-sdk/sdk.css"))
         write(root.resolve("common/amis-sdk/cxd.css"))

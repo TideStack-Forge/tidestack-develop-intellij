@@ -42,6 +42,12 @@ internal object TideStackDevelopConfigContracts {
     val localPath: String
         get() = contract.local.path
 
+    val projectFields: List<String>
+        get() = contract.project.fields
+
+    val localFields: List<String>
+        get() = contract.local.fields
+
     fun readProjectValue(document: JsonObject, field: String): String? {
         return readValue(document, contract.project, field)
     }
@@ -50,18 +56,24 @@ internal object TideStackDevelopConfigContracts {
         return readValue(document, contract.local, field)
     }
 
-    fun projectConfig(document: JsonObject): TideStackDevelopProjectConfig {
+    fun projectConfig(
+        document: JsonObject,
+        legacy: TideStackDevelopProjectConfig = TideStackDevelopProjectConfig()
+    ): TideStackDevelopProjectConfig {
         return TideStackDevelopProjectConfig(
             schemaVersion = readSchemaVersion(document),
-            developmentServerUrl = readProjectValue(document, "developmentServerUrl").orEmpty(),
-            appName = readProjectValue(document, "appName").orEmpty()
+            developmentServerUrl = readProjectValue(document, "developmentServerUrl") ?: legacy.developmentServerUrl,
+            appName = readProjectValue(document, "appName") ?: legacy.appName
         )
     }
 
-    fun localConfig(document: JsonObject): TideStackDevelopLocalConfig {
+    fun localConfig(
+        document: JsonObject,
+        legacy: TideStackDevelopLocalConfig = TideStackDevelopLocalConfig()
+    ): TideStackDevelopLocalConfig {
         return TideStackDevelopLocalConfig(
             schemaVersion = readSchemaVersion(document),
-            devKey = readLocalValue(document, "devKey").orEmpty()
+            devKey = readLocalValue(document, "devKey") ?: legacy.devKey
         )
     }
 
@@ -93,6 +105,17 @@ internal object TideStackDevelopConfigContracts {
                 "schemaVersion" to config.schemaVersion,
                 "devKey" to config.devKey
             )
+        )
+    }
+
+    fun effectiveConfig(
+        projectConfig: TideStackDevelopProjectConfig,
+        localConfig: TideStackDevelopLocalConfig
+    ): TideStackDevelopConfig {
+        return TideStackDevelopConfig(
+            developmentServerUrl = projectConfig.developmentServerUrl,
+            appName = projectConfig.appName,
+            devKey = localConfig.devKey
         )
     }
 

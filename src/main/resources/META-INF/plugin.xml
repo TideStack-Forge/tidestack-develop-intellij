@@ -86,8 +86,25 @@
     </extensions>
 
     <actions>
+        <group id="tidestack.develop.ProjectActionsGroup"
+               class="com.ouroboros.idea.actions.TideStackDevelopProjectActionsGroup"
+               text="TideStack Develop"
+               popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <action id="tidestack.develop.ConfigureProjectAction"
+                    class="com.ouroboros.idea.actions.ConfigureProjectAction"
+                    text="Configure Project"
+                    description="Configure TideStack Develop project binding"/>
+            <action id="tidestack.develop.OpenConfigFilesAction"
+                    class="com.ouroboros.idea.actions.OpenConfigFilesAction"
+                    text="Open Config Files"
+                    description="Open TideStack Develop Config files"/>
+        </group>
+
         <group id="tidestack.develop.metadata.NewMetadataFileGroup"
-               text="TideStack Metadata"
+               class="com.ouroboros.idea.actions.NewMetadataFileActionGroup"
+               text="创建 TideStack 模型"
                popup="true">
             <add-to-group group-id="NewGroup" anchor="last"/>
             <action id="tidestack.develop.metadata.NewAuthorityMetadataFileAction"
@@ -112,15 +129,15 @@
                     description="Create a TideStack UI schema metadata JSON file"/>
             <action id="tidestack.develop.metadata.NewAppModuleMetadataFileAction"
                     class="com.ouroboros.idea.metadata.NewAppModuleMetadataFileAction"
-                    text="应用模块"
+                    text="应用模块集合"
                     description="Create a TideStack app module metadata JSON file"/>
             <action id="tidestack.develop.metadata.NewConfigurationMetadataFileAction"
                     class="com.ouroboros.idea.metadata.NewConfigurationMetadataFileAction"
-                    text="配置项"
+                    text="配置项集合"
                     description="Create a TideStack configuration metadata JSON file"/>
             <action id="tidestack.develop.metadata.NewConfigurationGroupMetadataFileAction"
                     class="com.ouroboros.idea.metadata.NewConfigurationGroupMetadataFileAction"
-                    text="配置分组"
+                    text="配置分组集合"
                     description="Create a TideStack configuration group metadata JSON file"/>
         </group>
 

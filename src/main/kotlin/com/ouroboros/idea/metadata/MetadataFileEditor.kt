@@ -17,11 +17,11 @@ import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.JBColor
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
-import com.intellij.util.ui.UIUtil
 import com.ouroboros.idea.TideStackMessages
 import java.awt.BorderLayout
 import java.beans.PropertyChangeListener
@@ -33,7 +33,7 @@ import javax.swing.JPanel
 class MetadataFileEditor(
     private val project: Project,
     private val file: VirtualFile,
-    private val metadataType: String
+    private val schemaName: String
 ) : UserDataHolderBase(), FileEditor {
     private val gson = Gson()
     private val panel = JPanel(BorderLayout())
@@ -43,8 +43,6 @@ class MetadataFileEditor(
     private var saveQuery: JBCefJSQuery? = null
     private var readyQuery: JBCefJSQuery? = null
     private var diagnosticsLabel: JLabel? = null
-    private var watchedDocument: Document? = null
-    private var documentListener: DocumentListener? = null
     private var lastModified = false
 
     init {
@@ -67,7 +65,7 @@ class MetadataFileEditor(
                 MetadataEditorHtml.render(
                     assets = MetadataEditorAssets.locate(project, file),
                     uri = file.path,
-                    metadataType = metadataType,
+                    schemaName = schemaName,
                     initialDocumentJson = toBrowserDocumentJson(text, document),
                     initialTheme = currentAmisTheme(),
                     locale = TideStackMessages.currentLocale(),
@@ -126,7 +124,6 @@ class MetadataFileEditor(
     override fun getCurrentLocation(): FileEditorLocation? = null
 
     override fun dispose() {
-        documentListener?.let { listener -> watchedDocument?.removeDocumentListener(listener) }
         fallbackEditor?.let { EditorFactory.getInstance().releaseEditor(it) }
         saveQuery?.dispose()
         readyQuery?.dispose()
@@ -134,14 +131,12 @@ class MetadataFileEditor(
     }
 
     private fun watchDocument(document: Document) {
-        watchedDocument = document
         val listener = object : DocumentListener {
             override fun documentChanged(event: DocumentEvent) {
                 publishDocumentState(document)
             }
         }
-        document.addDocumentListener(listener)
-        documentListener = listener
+        document.addDocumentListener(listener, this)
     }
 
     private fun publishDocumentState(document: Document) {
@@ -171,7 +166,7 @@ class MetadataFileEditor(
         )
     }
 
-    private fun currentAmisTheme(): String = if (UIUtil.isUnderDarcula()) "dark" else "cxd"
+    private fun currentAmisTheme(): String = if (JBColor.isBright()) "cxd" else "dark"
 
     private fun handleReady(document: Document?): JBCefJSQuery.Response {
         if (document != null) {

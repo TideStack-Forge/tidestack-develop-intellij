@@ -68,23 +68,23 @@ object MetadataEditorAssets {
         return MetadataEditorAssetUris(
             htmlTemplate = readAssetText(
                 WEBVIEW_TEMPLATE_RESOURCE,
-                repoRoot.resolve("common/amis-schema/runtime/metadata-editor-webview.html")
+                repoRoot.resolve("common/metadata-editor-runtime/runtime/metadata-editor-webview.html")
             ),
             runtimeScriptUri = assetUri(
                 RUNTIME_RESOURCE,
-                repoRoot.resolve("common/amis-schema/runtime/metadata-editor-runtime.js")
+                repoRoot.resolve("common/metadata-editor-runtime/runtime/metadata-editor-runtime.js")
             ),
             hostRuntimeScriptUri = assetUri(
                 "$RESOURCE_ROOT/runtime/metadata-editor-host.js",
-                repoRoot.resolve("common/amis-schema/dist/browser/metadata-editor-host.js")
+                repoRoot.resolve("common/metadata-editor-runtime/dist/browser/metadata-editor-host.js")
             ),
             amisEditorRuntimeScriptUri = assetUri(
                 AMIS_EDITOR_RUNTIME_RESOURCE,
-                repoRoot.resolve("common/amis-schema/runtime/metadata-editor-amis-editor.js")
+                repoRoot.resolve("common/metadata-editor-runtime/runtime/metadata-editor-amis-editor.js")
             ),
             amisEditorCssUri = assetUri(
                 AMIS_EDITOR_CSS_RESOURCE,
-                repoRoot.resolve("common/amis-schema/runtime/metadata-editor-amis-editor.css")
+                repoRoot.resolve("common/metadata-editor-runtime/runtime/metadata-editor-amis-editor.css")
             ),
             amisSdkScriptUri = assetUri(
                 "ouroboros-metadata-editor/amis-sdk/sdk.js",
@@ -220,7 +220,7 @@ object MetadataEditorAssets {
             current = current.parent ?: current
         }
         while (current.parent != null) {
-            if (Files.exists(current.resolve("common/amis-schema/runtime/metadata-editor-runtime.js"))) {
+            if (Files.exists(current.resolve("common/metadata-editor-runtime/runtime/metadata-editor-runtime.js"))) {
                 return current
             }
             current = current.parent

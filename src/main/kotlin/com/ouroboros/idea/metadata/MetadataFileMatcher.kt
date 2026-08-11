@@ -10,15 +10,16 @@ data class MetadataFileMatch(
 )
 
 object MetadataFileMatcher {
-    private const val SOURCE_ROOT = "src/main/metadata/"
-    private const val PACKAGED_RESOURCE_ROOT = "resources/META-INF/ouroboros/"
-    private const val METADATA_RESOURCE_DIRECTORY = "metadata/"
-    private val FIXED_METADATA_FILE_TYPES = mapOf(
-        "app-modules.json" to "app-module",
-        "configuration.json" to "configuration",
-        "configuration-groups.json" to "configuration-group"
-    )
-    private val FIXED_METADATA_TYPES = FIXED_METADATA_FILE_TYPES.values.toSet()
+    private val creationContract: MetadataCreationContract get() = MetadataCreationContracts.current
+    private val sourceRoot: String get() = creationContract.sourceRootWithSlash
+    private val packagedResourceRoot: String get() = creationContract.packagedResourceRootWithSlash
+    private val metadataResourceDirectory: String get() = creationContract.metadataResourceDirectoryWithSlash
+    private val fixedMetadataFileTypes: Map<String, String>
+        get() = MetadataContributionRegistry.all.mapNotNull { contribution ->
+            contribution.fixedFileName?.let { fileName -> fileName to contribution.type }
+        }.toMap()
+    private val fixedMetadataTypes: Set<String>
+        get() = fixedMetadataFileTypes.values.toSet()
 
     fun match(path: String): MetadataFileMatch? {
         val normalizedPath = path.replace('\\', '/')
@@ -26,9 +27,9 @@ object MetadataFileMatcher {
     }
 
     private fun matchSourcePath(normalizedPath: String): MetadataFileMatch? {
-        val sourceRootIndex = normalizedPath.lastIndexOf(SOURCE_ROOT)
+        val sourceRootIndex = normalizedPath.lastIndexOf(sourceRoot)
         val relativePath = if (sourceRootIndex >= 0) {
-            normalizedPath.substring(sourceRootIndex + SOURCE_ROOT.length)
+            normalizedPath.substring(sourceRootIndex + sourceRoot.length)
         } else {
             normalizedPath.substringAfterLast('/')
         }
@@ -45,14 +46,14 @@ object MetadataFileMatcher {
     }
 
     private fun matchPackagedResourcePath(normalizedPath: String): MetadataFileMatch? {
-        val resourceRootIndex = normalizedPath.lastIndexOf(PACKAGED_RESOURCE_ROOT)
+        val resourceRootIndex = normalizedPath.lastIndexOf(packagedResourceRoot)
         if (resourceRootIndex < 0 || !normalizedPath.endsWith(".json")) {
             return null
         }
 
-        val relativePath = normalizedPath.substring(resourceRootIndex + PACKAGED_RESOURCE_ROOT.length)
-        val contribution = if (relativePath.startsWith(METADATA_RESOURCE_DIRECTORY)) {
-            contributionByMetadataRelativePath(relativePath.removePrefix(METADATA_RESOURCE_DIRECTORY))
+        val relativePath = normalizedPath.substring(resourceRootIndex + packagedResourceRoot.length)
+        val contribution = if (relativePath.startsWith(metadataResourceDirectory)) {
+            contributionByMetadataRelativePath(relativePath.removePrefix(metadataResourceDirectory))
         } else {
             MetadataContributionRegistry.byPackagedPath(relativePath)
         } ?: return null
@@ -80,11 +81,11 @@ object MetadataFileMatcher {
     }
 
     private fun contributionByMetadataRelativePath(relativePath: String): MetadataContributionDefinition? {
-        val fixedType = FIXED_METADATA_FILE_TYPES[relativePath]
+        val fixedType = fixedMetadataFileTypes[relativePath]
         if (fixedType != null) {
             return MetadataContributionRegistry.byType(fixedType)
         }
         val contribution = MetadataContributionRegistry.bySuffix(relativePath)
-        return contribution?.takeUnless { FIXED_METADATA_TYPES.contains(it.type) }
+        return contribution?.takeUnless { fixedMetadataTypes.contains(it.type) }
     }
 }
