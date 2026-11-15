@@ -93,7 +93,7 @@ class OuroborosConfigurable(private val project: Project) : Configurable {
         val virtualFile = FileChooser.chooseFile(descriptor, project, null) ?: return
         try {
             val content = File(virtualFile.path).readText()
-            val config = JsonParser.parseString(content).asJsonObject
+            val config = TideStackDevelopConfigContracts.importDocument(JsonParser.parseString(content).asJsonObject)
 
             developmentServerUrl = TideStackDevelopConfigContracts.readProjectValue(
                 config,

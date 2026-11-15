@@ -49,6 +49,9 @@ object MetadataEditorHtml {
             "{{AMIS_EDITOR_CSS_LINK}}" to assets.amisEditorCssUri
                 ?.let { "<link rel=\"stylesheet\" href=\"${escapeAttr(it)}\" />" }
                 .orEmpty(),
+            "{{EDITOR_BUNDLE_CSS_LINKS}}" to assets.editorBundleStyleUris.joinToString("\n") {
+                "<link rel=\"stylesheet\" href=\"${escapeAttr(it)}\" />"
+            },
             "{{RUNTIME_SCRIPT_URI}}" to escapeAttr(assets.runtimeScriptUri),
             "{{AMIS_EDITOR_RUNTIME_SCRIPT_TAG}}" to if (schemaName == "ui-schema") {
                 assets.amisEditorRuntimeScriptUri
@@ -57,6 +60,14 @@ object MetadataEditorHtml {
             } else {
                 ""
             },
+            "{{REACT_GLOBALS_SCRIPT_TAG}}" to reactGlobalsScriptTag(),
+            "{{EDITOR_INTEGRATION_SCRIPT_TAG}}" to assets.editorIntegrationScriptUri
+                ?.let { "<script src=\"${escapeAttr(it)}\"></script>" }
+                .orEmpty(),
+            "{{EDITOR_BUNDLE_SCRIPT_TAGS}}" to assets.editorBundleScriptUris.joinToString("\n") {
+                "<script src=\"${escapeAttr(it)}\"></script>"
+            },
+            "{{XLSX_RUNTIME_SCRIPT_TAG}}" to "<script src=\"${escapeAttr(assets.xlsxRuntimeScriptUri)}\"></script>",
             "{{HOST_RUNTIME_SCRIPT_TAG}}" to "<script src=\"${escapeAttr(assets.hostRuntimeScriptUri)}\"></script>",
             "{{HOST_SCRIPT}}" to hostScript
         )
@@ -76,6 +87,17 @@ object MetadataEditorHtml {
         .replace("\"", "&quot;")
 
     private fun escapeAttr(value: String): String = escape(value)
+
+    private fun reactGlobalsScriptTag(): String = """
+        <script>
+          (function () {
+            if (!window.amisRequire) return;
+            try { window.React = window.React || window.amisRequire('react'); } catch (_error) { console.debug('Metadata editor React shim fallback failed for react.', _error); }
+            try { window.ReactDOM = window.ReactDOM || window.amisRequire('react-dom/client'); } catch (_error) { console.debug('Metadata editor React shim fallback failed for react-dom/client.', _error); }
+            try { window.ReactDOM = window.ReactDOM || window.amisRequire('react-dom'); } catch (_error) { console.debug('Metadata editor React shim fallback failed for react-dom.', _error); }
+          })();
+        </script>
+    """.trimIndent()
 
     private fun escapeScriptJson(value: String): String = value.replace("</", "<\\/")
 

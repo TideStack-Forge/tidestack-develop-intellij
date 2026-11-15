@@ -15,6 +15,11 @@ object MetadataFileMatcher {
     private val packagedResourceRoot: String get() = creationContract.packagedResourceRootWithSlash
     private val metadataResourceDirectory: String get() = creationContract.metadataResourceDirectoryWithSlash
     private val fixedMetadataFileTypes: Map<String, String>
+        get() = MetadataContributionRegistry.all.flatMap { contribution ->
+            listOfNotNull(contribution.fixedFileName, *contribution.legacyFixedFileNames.toTypedArray())
+                .map { fileName -> fileName to contribution.type }
+        }.toMap()
+    private val standaloneFixedMetadataFileTypes: Map<String, String>
         get() = MetadataContributionRegistry.all.mapNotNull { contribution ->
             contribution.fixedFileName?.let { fileName -> fileName to contribution.type }
         }.toMap()
@@ -28,12 +33,13 @@ object MetadataFileMatcher {
 
     private fun matchSourcePath(normalizedPath: String): MetadataFileMatch? {
         val sourceRootIndex = normalizedPath.lastIndexOf(sourceRoot)
+        val hasSourceRoot = sourceRootIndex >= 0
         val relativePath = if (sourceRootIndex >= 0) {
             normalizedPath.substring(sourceRootIndex + sourceRoot.length)
         } else {
             normalizedPath.substringAfterLast('/')
         }
-        val contribution = contributionByMetadataRelativePath(relativePath) ?: return null
+        val contribution = contributionByMetadataRelativePath(relativePath, allowExactLegacyFixedName = hasSourceRoot) ?: return null
 
         return MetadataFileMatch(
             type = contribution.type,
@@ -53,7 +59,7 @@ object MetadataFileMatcher {
 
         val relativePath = normalizedPath.substring(resourceRootIndex + packagedResourceRoot.length)
         val contribution = if (relativePath.startsWith(metadataResourceDirectory)) {
-            contributionByMetadataRelativePath(relativePath.removePrefix(metadataResourceDirectory))
+            contributionByMetadataRelativePath(relativePath.removePrefix(metadataResourceDirectory), allowExactLegacyFixedName = true)
         } else {
             MetadataContributionRegistry.byPackagedPath(relativePath)
         } ?: return null
@@ -80,10 +86,21 @@ object MetadataFileMatcher {
         )
     }
 
-    private fun contributionByMetadataRelativePath(relativePath: String): MetadataContributionDefinition? {
-        val fixedType = fixedMetadataFileTypes[relativePath]
+    private fun contributionByMetadataRelativePath(
+        relativePath: String,
+        allowExactLegacyFixedName: Boolean
+    ): MetadataContributionDefinition? {
+        val fixedType = if (allowExactLegacyFixedName) {
+            fixedMetadataFileTypes[relativePath]
+        } else {
+            standaloneFixedMetadataFileTypes[relativePath]
+        }
         if (fixedType != null) {
             return MetadataContributionRegistry.byType(fixedType)
+        }
+        val standaloneFixedType = standaloneFixedMetadataFileTypes[relativePath.substringAfterLast('/')]
+        if (standaloneFixedType != null) {
+            return MetadataContributionRegistry.byType(standaloneFixedType)
         }
         val contribution = MetadataContributionRegistry.bySuffix(relativePath)
         return contribution?.takeUnless { fixedMetadataTypes.contains(it.type) }

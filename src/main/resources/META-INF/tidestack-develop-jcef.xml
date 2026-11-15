@@ -5,8 +5,31 @@
         <fileEditorProvider implementation="com.ouroboros.idea.metadata.DevMenuMetadataFileEditorProvider"/>
         <fileEditorProvider implementation="com.ouroboros.idea.metadata.UiModelMetadataFileEditorProvider"/>
         <fileEditorProvider implementation="com.ouroboros.idea.metadata.UiSchemaMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.BusinessMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.LogicflowMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.ApprovalWorkflowMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.FieldTypeMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.FlowNodeMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.WidgetMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.MicroWebMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.RpcMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.RpcAuthMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.WebapiMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.NotificationMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.BusinessLogMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.DataInitMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.MqMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.ScheduleMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.I18nMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.DataDictMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.PositionMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.ErrorCodeMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.AppMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.ModulesDiffMetadataFileEditorProvider"/>
         <fileEditorProvider implementation="com.ouroboros.idea.metadata.AppModuleMetadataFileEditorProvider"/>
         <fileEditorProvider implementation="com.ouroboros.idea.metadata.ConfigurationMetadataFileEditorProvider"/>
         <fileEditorProvider implementation="com.ouroboros.idea.metadata.ConfigurationGroupMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.ConfigurationItemMetadataFileEditorProvider"/>
+        <fileEditorProvider implementation="com.ouroboros.idea.metadata.ConfigurationGroupItemMetadataFileEditorProvider"/>
     </extensions>
 </idea-plugin>

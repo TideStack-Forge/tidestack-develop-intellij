@@ -31,6 +31,17 @@
             <li>Menu and development menu metadata</li>
             <li>UI model metadata</li>
             <li>UI Schema metadata</li>
+            <li>Business model metadata</li>
+            <li>Logic flow and approval workflow metadata</li>
+            <li>Field type metadata</li>
+            <li>Logic flow node metadata</li>
+            <li>Widget metadata</li>
+            <li>Micro web metadata</li>
+            <li>RPC model, RPC auth, and WebAPI metadata</li>
+            <li>Notification, business log, and data initialization metadata</li>
+            <li>MQ binding, schedule task, i18n locale, data dictionary, and position metadata</li>
+            <li>Error code collections</li>
+            <li>Application metadata and module tree diffs</li>
             <li>Application modules</li>
             <li>Configuration and configuration groups</li>
         </ul>
@@ -40,8 +51,13 @@
             The plugin supports both the new filename-based convention and the legacy resource directory convention.
             New projects can place metadata under <code>src/main/metadata</code> using files such as
             <code>*.menu.json</code>, <code>*.authority.json</code>, <code>*.ui-model.json</code>,
-            <code>*.ui-schema.json</code>, <code>app-modules.json</code>, <code>configuration.json</code>,
-            and <code>configuration-groups.json</code>.
+            <code>*.ui-schema.json</code>, <code>*.business.json</code>, <code>*.field-type.json</code>, <code>*.flow-node.json</code>,
+            <code>*.logicflow.json</code>, <code>*.workflow.json</code>, <code>*.widget.json</code>, <code>*.micro-web.json</code>, <code>*.rpc.json</code>,
+            <code>*.rpc.auth.json</code>, <code>*.webapi.json</code>, <code>*.notification.json</code>, <code>*.business-log.json</code>,
+            <code>*.data-init.json</code>, <code>*.mq.json</code>, <code>*.schedule.json</code>,
+            <code>*.i18n.json</code>, <code>*.dict.json</code>, <code>*.position.json</code>, <code>error-codes.error.json</code>,
+            <code>app.metadata.json</code>, <code>modules.diff.json</code>, <code>app-modules.json</code>,
+            <code>configurations.json</code>, and <code>configuration-groups.json</code>.
         </p>
 
         <h2>TideStack Develop Config</h2>
@@ -127,6 +143,90 @@
                     class="com.ouroboros.idea.metadata.NewUiSchemaMetadataFileAction"
                     text="UI Schema"
                     description="Create a TideStack UI schema metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewBusinessMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewBusinessMetadataFileAction"
+                    text="业务模型"
+                    description="Create a TideStack business model metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewLogicflowMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewLogicflowMetadataFileAction"
+                    text="逻辑流模型"
+                    description="Create a TideStack logic flow model metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewApprovalWorkflowMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewApprovalWorkflowMetadataFileAction"
+                    text="审批流"
+                    description="Create a TideStack approval workflow metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewFieldTypeMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewFieldTypeMetadataFileAction"
+                    text="字段类型"
+                    description="Create a TideStack field type metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewFlowNodeMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewFlowNodeMetadataFileAction"
+                    text="逻辑流节点"
+                    description="Create a TideStack logic flow node metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewWidgetMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewWidgetMetadataFileAction"
+                    text="组件定义"
+                    description="Create a TideStack widget metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewMicroWebMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewMicroWebMetadataFileAction"
+                    text="微前端"
+                    description="Create a TideStack micro web metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewRpcMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewRpcMetadataFileAction"
+                    text="RPC 模型"
+                    description="Create a TideStack RPC metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewRpcAuthMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewRpcAuthMetadataFileAction"
+                    text="RPC 认证"
+                    description="Create a TideStack RPC auth metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewWebapiMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewWebapiMetadataFileAction"
+                    text="WebAPI 模型"
+                    description="Create a TideStack WebAPI metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewNotificationMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewNotificationMetadataFileAction"
+                    text="通知模板"
+                    description="Create a TideStack notification template metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewBusinessLogMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewBusinessLogMetadataFileAction"
+                    text="业务日志模板"
+                    description="Create a TideStack business log template metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewDataInitMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewDataInitMetadataFileAction"
+                    text="数据初始化"
+                    description="Create a TideStack data initialization metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewMqMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewMqMetadataFileAction"
+                    text="MQ 绑定"
+                    description="Create a TideStack MQ binding metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewScheduleMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewScheduleMetadataFileAction"
+                    text="定时任务"
+                    description="Create a TideStack schedule metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewI18nMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewI18nMetadataFileAction"
+                    text="国际化语言包"
+                    description="Create a TideStack i18n locale metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewDataDictMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewDataDictMetadataFileAction"
+                    text="数据字典"
+                    description="Create a TideStack data dictionary metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewPositionMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewPositionMetadataFileAction"
+                    text="岗位定义"
+                    description="Create a TideStack position metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewErrorCodeMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewErrorCodeMetadataFileAction"
+                    text="错误码集合"
+                    description="Create a TideStack error code metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewAppMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewAppMetadataFileAction"
+                    text="应用元数据"
+                    description="Create a TideStack app metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewModulesDiffMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewModulesDiffMetadataFileAction"
+                    text="模块树 Diff"
+                    description="Create a TideStack module tree diff metadata JSON file"/>
             <action id="tidestack.develop.metadata.NewAppModuleMetadataFileAction"
                     class="com.ouroboros.idea.metadata.NewAppModuleMetadataFileAction"
                     text="应用模块集合"
@@ -139,6 +239,14 @@
                     class="com.ouroboros.idea.metadata.NewConfigurationGroupMetadataFileAction"
                     text="配置分组集合"
                     description="Create a TideStack configuration group metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewConfigurationItemMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewConfigurationItemMetadataFileAction"
+                    text="配置项"
+                    description="Create a TideStack configuration item metadata JSON file"/>
+            <action id="tidestack.develop.metadata.NewConfigurationGroupItemMetadataFileAction"
+                    class="com.ouroboros.idea.metadata.NewConfigurationGroupItemMetadataFileAction"
+                    text="配置分组"
+                    description="Create a TideStack configuration group item metadata JSON file"/>
         </group>
 
         <!-- Toolbar Actions -->

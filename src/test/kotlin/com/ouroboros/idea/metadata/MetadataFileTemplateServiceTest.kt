@@ -22,9 +22,32 @@ class MetadataFileTemplateServiceTest {
             "example.dev-menu.json",
             "example.ui-model.json",
             "example.ui-schema.json",
+            "example.business.json",
+            "example.logicflow.json",
+            "example.workflow.json",
+            "example.field-type.json",
+            "example.flow-node.json",
+            "example.widget.json",
+            "example.micro-web.json",
+            "example.rpc.json",
+            "example.rpc.auth.json",
+            "example.webapi.json",
+            "example.notification.json",
+            "example.business-log.json",
+            "example.data-init.json",
+            "example.mq.json",
+            "example.schedule.json",
+            "example.i18n.json",
+            "example.dict.json",
+            "example.position.json",
+            "error-codes.error.json",
+            "app.metadata.json",
+            "modules.diff.json",
             "app-modules.json",
-            "configuration.json",
-            "configuration-groups.json"
+            "configurations.json",
+            "configuration-groups.json",
+            "example.config.json",
+            "example.config-group.json"
         )
 
         assertEquals(expectedTemplateFiles, MetadataContributionRegistry.all.map { it.fileTemplate?.defaultFileName })
@@ -47,6 +70,29 @@ class MetadataFileTemplateServiceTest {
             assertEquals("应用模块集合", TideStackMessages.actionText("metadata.type.app-module.command"))
             assertEquals("配置项集合", TideStackMessages.actionText("metadata.type.configuration.command"))
             assertEquals("配置分组集合", TideStackMessages.actionText("metadata.type.configuration-group.command"))
+            assertEquals("配置项", TideStackMessages.actionText("metadata.type.configuration-item.command"))
+            assertEquals("配置分组", TideStackMessages.actionText("metadata.type.configuration-group-item.command"))
+            assertEquals("业务模型", TideStackMessages.actionText("metadata.type.business.command"))
+            assertEquals("逻辑流模型", TideStackMessages.actionText("metadata.type.logicflow.command"))
+            assertEquals("审批流", TideStackMessages.actionText("metadata.type.approval-workflow.command"))
+            assertEquals("字段类型", TideStackMessages.actionText("metadata.type.field-type.command"))
+            assertEquals("逻辑流节点", TideStackMessages.actionText("metadata.type.flow-node.command"))
+            assertEquals("组件定义", TideStackMessages.actionText("metadata.type.widget.command"))
+            assertEquals("微前端", TideStackMessages.actionText("metadata.type.micro-web.command"))
+            assertEquals("RPC 模型", TideStackMessages.actionText("metadata.type.rpc.command"))
+            assertEquals("RPC 认证", TideStackMessages.actionText("metadata.type.rpc-auth.command"))
+            assertEquals("WebAPI 模型", TideStackMessages.actionText("metadata.type.webapi.command"))
+            assertEquals("通知模板", TideStackMessages.actionText("metadata.type.notification.command"))
+            assertEquals("业务日志模板", TideStackMessages.actionText("metadata.type.business-log.command"))
+            assertEquals("数据初始化", TideStackMessages.actionText("metadata.type.data-init.command"))
+            assertEquals("MQ 绑定", TideStackMessages.actionText("metadata.type.mq.command"))
+            assertEquals("定时任务", TideStackMessages.actionText("metadata.type.schedule.command"))
+            assertEquals("国际化语言包", TideStackMessages.actionText("metadata.type.i18n.command"))
+            assertEquals("数据字典", TideStackMessages.actionText("metadata.type.data-dict.command"))
+            assertEquals("岗位定义", TideStackMessages.actionText("metadata.type.position.command"))
+            assertEquals("错误码集合", TideStackMessages.actionText("metadata.type.error-code.command"))
+            assertEquals("应用元数据", TideStackMessages.actionText("metadata.type.app-metadata.command"))
+            assertEquals("模块树 Diff", TideStackMessages.actionText("metadata.type.modules-diff.command"))
         } finally {
             Locale.setDefault(previousLocale)
         }

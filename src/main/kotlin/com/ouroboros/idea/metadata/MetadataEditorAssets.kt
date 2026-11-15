@@ -18,8 +18,12 @@ data class MetadataEditorAssetUris(
     val amisSdkCssUri: String,
     val amisThemeCssUri: String,
     val amisDarkThemeCssUri: String,
+    val xlsxRuntimeScriptUri: String,
     val amisEditorRuntimeScriptUri: String? = null,
-    val amisEditorCssUri: String? = null
+    val amisEditorCssUri: String? = null,
+    val editorIntegrationScriptUri: String? = null,
+    val editorBundleScriptUris: List<String> = emptyList(),
+    val editorBundleStyleUris: List<String> = emptyList()
 )
 
 object MetadataEditorAssets {
@@ -86,6 +90,30 @@ object MetadataEditorAssets {
                 AMIS_EDITOR_CSS_RESOURCE,
                 repoRoot.resolve("common/metadata-editor-runtime/runtime/metadata-editor-amis-editor.css")
             ),
+            editorIntegrationScriptUri = assetUri(
+                "$RESOURCE_ROOT/editor-integrations/metadata-editor-integrations.js",
+                repoRoot.resolve("ide-plugins/common/metadata-editor-schema/dist/editor-integrations/metadata-editor-integrations.js")
+            ),
+            editorBundleScriptUris = listOf(
+                assetUri(
+                    "$RESOURCE_ROOT/editor-bundles/logicflow/static/js/app.js",
+                    repoRoot.resolve("frontends/web/ouroboros-logicflow-editor/dist/static/js/app.js")
+                ),
+                assetUri(
+                    "$RESOURCE_ROOT/editor-bundles/approval-workflow/static/js/app.js",
+                    repoRoot.resolve("frontends/web/ouroboros-approval-workflow-designer/dist/static/js/app.js")
+                )
+            ),
+            editorBundleStyleUris = listOf(
+                assetUri(
+                    "$RESOURCE_ROOT/editor-bundles/logicflow/static/css/app.css",
+                    repoRoot.resolve("frontends/web/ouroboros-logicflow-editor/dist/static/css/app.css")
+                ),
+                assetUri(
+                    "$RESOURCE_ROOT/editor-bundles/approval-workflow/static/css/app.css",
+                    repoRoot.resolve("frontends/web/ouroboros-approval-workflow-designer/dist/static/css/app.css")
+                )
+            ),
             amisSdkScriptUri = assetUri(
                 "ouroboros-metadata-editor/amis-sdk/sdk.js",
                 repoRoot.resolve("common/amis-sdk/sdk.js")
@@ -101,6 +129,10 @@ object MetadataEditorAssets {
             amisDarkThemeCssUri = assetUri(
                 "ouroboros-metadata-editor/amis-sdk/dark.css",
                 repoRoot.resolve("common/amis-sdk/dark.css")
+            ),
+            xlsxRuntimeScriptUri = assetUri(
+                "ouroboros-metadata-editor/xlsx/xlsx.full.min.js",
+                repoRoot.resolve("frontends/web/node_modules/xlsx/dist/xlsx.full.min.js")
             )
         )
     }
@@ -115,10 +147,20 @@ object MetadataEditorAssets {
             hostRuntimeScriptUri = fileUri(assetRoot.resolve("runtime/metadata-editor-host.js")),
             amisEditorRuntimeScriptUri = fileUri(assetRoot.resolve("runtime/metadata-editor-amis-editor.js")),
             amisEditorCssUri = fileUri(assetRoot.resolve("runtime/metadata-editor-amis-editor.css")),
+            editorIntegrationScriptUri = fileUri(assetRoot.resolve("editor-integrations/metadata-editor-integrations.js")),
+            editorBundleScriptUris = listOf(
+                fileUri(assetRoot.resolve("editor-bundles/logicflow/static/js/app.js")),
+                fileUri(assetRoot.resolve("editor-bundles/approval-workflow/static/js/app.js"))
+            ),
+            editorBundleStyleUris = listOf(
+                fileUri(assetRoot.resolve("editor-bundles/logicflow/static/css/app.css")),
+                fileUri(assetRoot.resolve("editor-bundles/approval-workflow/static/css/app.css"))
+            ),
             amisSdkScriptUri = fileUri(assetRoot.resolve("amis-sdk/sdk.js")),
             amisSdkCssUri = fileUri(assetRoot.resolve("amis-sdk/sdk.css")),
             amisThemeCssUri = fileUri(assetRoot.resolve("amis-sdk/cxd.css")),
-            amisDarkThemeCssUri = fileUri(assetRoot.resolve("amis-sdk/dark.css"))
+            amisDarkThemeCssUri = fileUri(assetRoot.resolve("amis-sdk/dark.css")),
+            xlsxRuntimeScriptUri = fileUri(assetRoot.resolve("xlsx/xlsx.full.min.js"))
         )
     }
 

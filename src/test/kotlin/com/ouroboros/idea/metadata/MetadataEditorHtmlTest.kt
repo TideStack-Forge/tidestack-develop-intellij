@@ -16,7 +16,8 @@ class MetadataEditorHtmlTest {
                 amisSdkScriptUri = "file:///amis/sdk.js",
                 amisSdkCssUri = "file:///amis/sdk.css",
                 amisThemeCssUri = "file:///amis/cxd.css",
-                amisDarkThemeCssUri = "file:///amis/dark.css"
+                amisDarkThemeCssUri = "file:///amis/dark.css",
+                xlsxRuntimeScriptUri = "file:///xlsx/xlsx.full.min.js"
             ),
             uri = "file:///main.menu.json",
             schemaName = "menu",
@@ -31,6 +32,7 @@ class MetadataEditorHtmlTest {
         assertTrue(html.contains("width: 100%; height: 100%;"))
         assertTrue(html.contains("id=\"metadata-amis-theme-cxd\""))
         assertTrue(html.contains("id=\"metadata-amis-theme-dark\""))
+        assertTrue(html.contains("src=\"file:///xlsx/xlsx.full.min.js\""))
         assertTrue(html.contains("theme: \"dark\""))
         assertTrue(html.contains("locale: \"en-US\""))
     }

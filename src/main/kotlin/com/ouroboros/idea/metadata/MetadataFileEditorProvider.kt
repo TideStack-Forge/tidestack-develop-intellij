@@ -52,6 +52,90 @@ class UiSchemaMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
     metadataType = "ui-schema"
 )
 
+class BusinessMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "business"
+)
+
+class LogicflowMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "logicflow"
+)
+
+class ApprovalWorkflowMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "approval-workflow"
+)
+
+class FieldTypeMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "field-type"
+)
+
+class FlowNodeMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "flow-node"
+)
+
+class WidgetMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "widget"
+)
+
+class MicroWebMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "micro-web"
+)
+
+class RpcMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "rpc"
+)
+
+class RpcAuthMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "rpc-auth"
+)
+
+class WebapiMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "webapi"
+)
+
+class NotificationMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "notification"
+)
+
+class BusinessLogMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "business-log"
+)
+
+class DataInitMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "data-init"
+)
+
+class MqMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "mq"
+)
+
+class ScheduleMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "schedule"
+)
+
+class I18nMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "i18n"
+)
+
+class DataDictMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "data-dict"
+)
+
+class PositionMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "position"
+)
+
+class ErrorCodeMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "error-code"
+)
+
+class AppMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "app-metadata"
+)
+
+class ModulesDiffMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "modules-diff"
+)
+
 class AppModuleMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
     metadataType = "app-module"
 )
@@ -62,4 +146,12 @@ class ConfigurationMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
 
 class ConfigurationGroupMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
     metadataType = "configuration-group"
+)
+
+class ConfigurationItemMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "configuration-item"
+)
+
+class ConfigurationGroupItemMetadataFileEditorProvider : TypedMetadataFileEditorProvider(
+    metadataType = "configuration-group-item"
 )

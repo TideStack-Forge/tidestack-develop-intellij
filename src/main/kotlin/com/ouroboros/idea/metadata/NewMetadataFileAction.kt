@@ -145,8 +145,54 @@ class NewUiModelMetadataFileAction : NewTypedMetadataFileAction("ui-model")
 
 class NewUiSchemaMetadataFileAction : NewTypedMetadataFileAction("ui-schema")
 
+class NewBusinessMetadataFileAction : NewTypedMetadataFileAction("business")
+
+class NewLogicflowMetadataFileAction : NewTypedMetadataFileAction("logicflow")
+
+class NewApprovalWorkflowMetadataFileAction : NewTypedMetadataFileAction("approval-workflow")
+
+class NewFieldTypeMetadataFileAction : NewTypedMetadataFileAction("field-type")
+
+class NewFlowNodeMetadataFileAction : NewTypedMetadataFileAction("flow-node")
+
+class NewWidgetMetadataFileAction : NewTypedMetadataFileAction("widget")
+
+class NewMicroWebMetadataFileAction : NewTypedMetadataFileAction("micro-web")
+
+class NewRpcMetadataFileAction : NewTypedMetadataFileAction("rpc")
+
+class NewRpcAuthMetadataFileAction : NewTypedMetadataFileAction("rpc-auth")
+
+class NewWebapiMetadataFileAction : NewTypedMetadataFileAction("webapi")
+
+class NewNotificationMetadataFileAction : NewTypedMetadataFileAction("notification")
+
+class NewBusinessLogMetadataFileAction : NewTypedMetadataFileAction("business-log")
+
+class NewDataInitMetadataFileAction : NewTypedMetadataFileAction("data-init")
+
+class NewMqMetadataFileAction : NewTypedMetadataFileAction("mq")
+
+class NewScheduleMetadataFileAction : NewTypedMetadataFileAction("schedule")
+
+class NewI18nMetadataFileAction : NewTypedMetadataFileAction("i18n")
+
+class NewDataDictMetadataFileAction : NewTypedMetadataFileAction("data-dict")
+
+class NewPositionMetadataFileAction : NewTypedMetadataFileAction("position")
+
+class NewErrorCodeMetadataFileAction : NewTypedMetadataFileAction("error-code")
+
+class NewAppMetadataFileAction : NewTypedMetadataFileAction("app-metadata")
+
+class NewModulesDiffMetadataFileAction : NewTypedMetadataFileAction("modules-diff")
+
 class NewAppModuleMetadataFileAction : NewTypedMetadataFileAction("app-module")
 
 class NewConfigurationMetadataFileAction : NewTypedMetadataFileAction("configuration")
 
 class NewConfigurationGroupMetadataFileAction : NewTypedMetadataFileAction("configuration-group")
+
+class NewConfigurationItemMetadataFileAction : NewTypedMetadataFileAction("configuration-item")
+
+class NewConfigurationGroupItemMetadataFileAction : NewTypedMetadataFileAction("configuration-group-item")

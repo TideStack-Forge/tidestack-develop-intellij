@@ -57,6 +57,17 @@ class TideStackDevelopConfigContractTest {
     }
 
     @Test
+    fun `matches shared config import document contract cases`() {
+        cases.importDocumentCases.forEach { importCase ->
+            assertEquals(
+                importCase.expected,
+                TideStackDevelopConfigContracts.importDocument(importCase.document),
+                importCase.name
+            )
+        }
+    }
+
+    @Test
     fun `matches shared effective config contract cases`() {
         cases.effectiveCases.forEach { effectiveCase ->
             assertEquals(
@@ -83,6 +94,7 @@ class TideStackDevelopConfigContractTest {
         val localReadCases: List<LocalReadCase> = emptyList(),
         val projectDocumentCases: List<ProjectDocumentCase> = emptyList(),
         val localDocumentCases: List<LocalDocumentCase> = emptyList(),
+        val importDocumentCases: List<ImportDocumentCase> = emptyList(),
         val effectiveCases: List<EffectiveCase> = emptyList()
     )
 
@@ -121,6 +133,12 @@ class TideStackDevelopConfigContractTest {
         val existing: JsonObject = JsonObject(),
         val config: TideStackDevelopLocalConfig = TideStackDevelopLocalConfig(),
         val expectedKeys: List<String> = emptyList(),
+        val expected: JsonObject = JsonObject()
+    )
+
+    private data class ImportDocumentCase(
+        val name: String = "",
+        val document: JsonObject = JsonObject(),
         val expected: JsonObject = JsonObject()
     )
 

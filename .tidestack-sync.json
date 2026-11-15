@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "managedBy": "scripts/open-source/sync-ide-plugins.mjs",
   "sourceRepository": "ouroboros",
-  "sourceCommit": "7162b873dd80b37091059ae1d1f5bd41c3ad66dd",
-  "sourceManagedContentHash": "7777f874844f3d1fb234655ab3e6474ddfc65a1ef5ec56429a09305fe9a420ec",
+  "sourceCommit": "5a785aca7421dde216eac47540ea41273b846fd6",
+  "sourceManagedContentHash": "f298233f81d0ee3d8b69194d386e606da5984e6f761ae28bd9caf2570ddf4d24",
   "targetRepository": "intellij",
   "managedPaths": [
     "build.gradle.kts",
@@ -14,6 +14,6 @@
     "src"
   ],
   "submodules": {
-    "common": "d04a67543ca75792b2c6ef8905b8ff5e90f2f5e0"
+    "common": "8745de43ba4c701b68c65d3d9bdc8d384b0f18c6"
   }
 }

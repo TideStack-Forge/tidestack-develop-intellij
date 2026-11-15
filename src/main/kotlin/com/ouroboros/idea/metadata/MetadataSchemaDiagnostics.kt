@@ -53,7 +53,14 @@ object MetadataSchemaDiagnostics {
             return diagnostics
         }
 
-        when (schema.get("type")?.asString) {
+        val schemaTypes = schemaTypes(schema.get("type"))
+        val matchingType = schemaTypes.firstOrNull { schemaTypeMatches(value, it) }
+        if (schemaTypes.isNotEmpty() && matchingType == null) {
+            diagnostics.add(typeDiagnostic(path, schemaTypes))
+            return diagnostics
+        }
+
+        when (matchingType) {
             "object" -> {
                 if (!value.isJsonObject) {
                     diagnostics.add(typeDiagnostic(path, "object"))
@@ -114,9 +121,14 @@ object MetadataSchemaDiagnostics {
     }
 
     private fun typeDiagnostic(path: String, expectedType: String): MetadataSchemaDiagnostic {
+        return typeDiagnostic(path, listOf(expectedType))
+    }
+
+    private fun typeDiagnostic(path: String, expectedTypes: List<String>): MetadataSchemaDiagnostic {
+        val expected = expectedTypes.joinToString(" or ") { if (it == "null") "null" else "a $it" }
         return MetadataSchemaDiagnostic(
             code = "schema-property-type",
-            message = "Metadata property '$path' must be a $expectedType.",
+            message = "Metadata property '$path' must be $expected.",
             severity = MetadataSchemaDiagnosticSeverity.ERROR,
             path = path.ifEmpty { null }
         )
@@ -133,6 +145,31 @@ object MetadataSchemaDiagnostics {
 
     private fun joinPath(prefix: String, name: String): String {
         return if (prefix.isEmpty()) name else "$prefix.$name"
+    }
+
+    private fun schemaTypes(typeElement: JsonElement?): List<String> {
+        return when {
+            typeElement == null -> emptyList()
+            typeElement.isJsonPrimitive -> listOf(typeElement.asString)
+            typeElement.isJsonArray -> typeElement.asJsonArray.mapNotNull { type ->
+                if (type.isJsonPrimitive) type.asString else null
+            }
+
+            else -> emptyList()
+        }
+    }
+
+    private fun schemaTypeMatches(value: JsonElement, expectedType: String): Boolean {
+        return when (expectedType) {
+            "object" -> value.isJsonObject
+            "array" -> value.isJsonArray
+            "string" -> value.isJsonPrimitive && value.asJsonPrimitive.isString
+            "number" -> value.isJsonPrimitive && value.asJsonPrimitive.isNumber
+            "integer" -> isInteger(value)
+            "boolean" -> value.isJsonPrimitive && value.asJsonPrimitive.isBoolean
+            "null" -> value.isJsonNull
+            else -> false
+        }
     }
 
     private fun enumContains(enumValues: Iterable<JsonElement>, value: JsonElement): Boolean {

@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.ouroboros"
-version = "0.1.2"
+version = "0.2.0"
 
 val metadataRuntimeDir = file("common/metadata-editor-runtime/runtime")
 val metadataEditorRuntimeDir = file("common/metadata-editor-runtime")
@@ -17,19 +17,29 @@ val metadataEditorAssets = JsonSlurper().parse(metadataEditorAssetManifest) as M
 val metadataHostRuntime = file("common/metadata-editor-runtime/dist/browser/metadata-editor-host.js")
 val tideStackI18nDir = file("common/metadata-editor-schema/dist/i18n")
 val amisSdkDir = file("common/amis-sdk")
+val xlsxRuntimeDir = file("../../frontends/web/node_modules/xlsx/dist")
 fun metadataEditorAssetList(key: String): List<String> {
     return (metadataEditorAssets[key] as? List<*>)?.map { it.toString() } ?: emptyList()
 }
+val metadataEditorBundleDefinitions = (metadataEditorAssets["editorBundles"] as? List<*>)
+    ?.mapNotNull { it as? Map<*, *> }
+    ?: emptyList()
 
 val metadataRuntimeAssets = metadataEditorAssetList("runtimeFiles").map(metadataEditorRuntimeDir::resolve)
 val metadataSchemaAssets = metadataEditorAssetList("schemaFiles").map { file("common/metadata-editor-schema/dist/$it") }
+val metadataEditorIntegrationAssets = metadataEditorAssetList("editorIntegrationFiles").map { file("common/metadata-editor-schema/dist/$it") }
+val metadataEditorBundleAssets = metadataEditorBundleDefinitions.flatMap { bundle ->
+    val sourceRoot = file("../..").resolve(bundle["sourceRoot"].toString())
+    (bundle["requiredFiles"] as? List<*>)?.map { sourceRoot.resolve(it.toString()) } ?: emptyList()
+}
 val tideStackDevelopConfigContracts = metadataEditorAssetList("contractFiles").map { file("common/contracts/$it") }
 val tideStackI18nAssets = metadataEditorAssetList("i18nFiles").map(tideStackI18nDir::resolve)
 val amisSdkRequiredAssets = metadataEditorAssetList("amisSdkRequiredFiles").map(amisSdkDir::resolve)
+val xlsxRuntimeAssets = metadataEditorAssetList("xlsxRuntimeFiles").map(xlsxRuntimeDir::resolve)
 val requiredMetadataEditorAssets = listOf(
     metadataHostRuntime,
     amisSdkDir.resolve("thirds/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2")
-) + metadataRuntimeAssets + metadataSchemaAssets + tideStackDevelopConfigContracts + tideStackI18nAssets + amisSdkRequiredAssets
+) + metadataRuntimeAssets + metadataSchemaAssets + metadataEditorIntegrationAssets + metadataEditorBundleAssets + tideStackDevelopConfigContracts + tideStackI18nAssets + amisSdkRequiredAssets + xlsxRuntimeAssets
 
 repositories {
     mavenCentral()
@@ -55,14 +65,21 @@ tasks {
         workingDir(metadataEditorRuntimeDir)
         commandLine("npm", "run", "build")
         inputs.files(fileTree(metadataEditorRuntimeDir) {
-            include("src/**", "package.json", "tsconfig*.json", "vite.browser-host.config.ts")
+            include("src/**", "package.json", "tsconfig*.json", "vite.browser-host.config.ts", "vite.amis-editor.config.ts", "scripts/**")
         })
         inputs.files(fileTree(metadataEditorSchemaDir) {
-            include("metadata-types/**", "metadata-editors/**", "i18n/**", "tidestackDevelopCapabilities.json", "package.json", "scripts/**")
+            include("metadata-types/**", "metadata-editors/**", "editor-schemas/**", "i18n/**", "tidestackDevelopCapabilities.json", "package.json", "scripts/**")
             include("metadataCreationContract.json", "metadataCreationCases.json", "metadataEditorAssets.json")
         })
+        metadataEditorBundleDefinitions.forEach { bundle ->
+            inputs.files(fileTree(file("../..").resolve(bundle["sourceRoot"].toString()).parentFile) {
+                include("src/**", "public/**", "package.json", "webpack.config.js", "babel.config.js")
+            })
+        }
         outputs.file(metadataHostRuntime)
         outputs.files(metadataSchemaAssets)
+        outputs.files(metadataEditorIntegrationAssets)
+        outputs.files(metadataEditorBundleAssets)
     }
 
     val verifyMetadataEditorAssets by registering {
@@ -118,6 +135,16 @@ tasks {
                 into("ouroboros-metadata-editor")
             }
         }
+        metadataEditorIntegrationAssets.forEach { asset ->
+            from(asset) {
+                into("ouroboros-metadata-editor/editor-integrations")
+            }
+        }
+        metadataEditorBundleDefinitions.forEach { bundle ->
+            from(file("../..").resolve(bundle["sourceRoot"].toString())) {
+                into("ouroboros-metadata-editor/${bundle["targetRoot"]}")
+            }
+        }
         tideStackDevelopConfigContracts.forEach { asset ->
             from(asset) {
                 into("ouroboros-ide-contracts")
@@ -128,6 +155,11 @@ tasks {
         }
         from(amisSdkDir) {
             into("ouroboros-metadata-editor/amis-sdk")
+        }
+        xlsxRuntimeAssets.forEach { asset ->
+            from(asset) {
+                into("ouroboros-metadata-editor/xlsx")
+            }
         }
     }
 

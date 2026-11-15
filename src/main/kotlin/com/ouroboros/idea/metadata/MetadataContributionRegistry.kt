@@ -8,6 +8,7 @@ data class MetadataContributionDefinition(
     val type: String = "",
     val fileSuffix: String? = null,
     val fixedFileName: String? = null,
+    val legacyFixedFileNames: List<String> = emptyList(),
     val displayName: String = "",
     val sourcePathPatterns: List<String> = emptyList(),
     val packagedPathPrefix: String = "",
@@ -63,11 +64,18 @@ object MetadataContributionRegistry {
     }
 
     fun byPackagedPath(relativePath: String): MetadataContributionDefinition? {
-        return all.firstOrNull { contribution ->
-            val runtimeDirectory = contribution.packagedPathPrefix.removePrefix("META-INF/ouroboros/")
-            contribution.packagedPathPatterns.contains(relativePath)
-                || relativePath.startsWith("$runtimeDirectory/")
+        val suffixContribution = bySuffix(relativePath)
+        if (suffixContribution != null && suffixContribution.ownsPackagedRelativePath(relativePath)) {
+            return suffixContribution
         }
+        return all.firstOrNull { contribution ->
+            contribution.ownsPackagedRelativePath(relativePath)
+        }
+    }
+
+    private fun MetadataContributionDefinition.ownsPackagedRelativePath(relativePath: String): Boolean {
+        val runtimeDirectory = packagedPathPrefix.removePrefix("META-INF/ouroboros/")
+        return packagedPathPatterns.contains(relativePath) || relativePath.startsWith("$runtimeDirectory/")
     }
 
     private data class MetadataContributionManifest(

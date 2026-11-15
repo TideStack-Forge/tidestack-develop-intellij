@@ -66,7 +66,7 @@ class MetadataSchemaDiagnosticsTest {
             "[{\"fullName\":7}]"
         )
         val configurationDiagnostics = MetadataSchemaDiagnostics.validate(
-            "/repo/src/main/resources/META-INF/ouroboros/configuration.json",
+            "/repo/src/main/resources/META-INF/ouroboros/configurations.json",
             "[{\"key\":\"platform.enabled\",\"label\":\"Enabled\",\"valueType\":\"unknown\"}]"
         )
 

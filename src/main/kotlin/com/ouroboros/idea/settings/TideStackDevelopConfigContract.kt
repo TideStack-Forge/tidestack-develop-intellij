@@ -108,6 +108,11 @@ internal object TideStackDevelopConfigContracts {
         )
     }
 
+    fun importDocument(document: JsonObject): JsonObject {
+        val data = document.get("data")
+        return if (data != null && data.isJsonObject) data.asJsonObject else document
+    }
+
     fun effectiveConfig(
         projectConfig: TideStackDevelopProjectConfig,
         localConfig: TideStackDevelopLocalConfig
