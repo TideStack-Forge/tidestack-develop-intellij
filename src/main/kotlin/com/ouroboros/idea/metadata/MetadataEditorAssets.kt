@@ -92,26 +92,26 @@ object MetadataEditorAssets {
             ),
             editorIntegrationScriptUri = assetUri(
                 "$RESOURCE_ROOT/editor-integrations/metadata-editor-integrations.js",
-                repoRoot.resolve("ide-plugins/common/metadata-editor-schema/dist/editor-integrations/metadata-editor-integrations.js")
+                repoRoot.resolve("common/metadata-editor-schema/dist/editor-integrations/metadata-editor-integrations.js")
             ),
             editorBundleScriptUris = listOf(
                 assetUri(
                     "$RESOURCE_ROOT/editor-bundles/logicflow/static/js/app.js",
-                    repoRoot.resolve("frontends/web/ouroboros-logicflow-editor/dist/static/js/app.js")
+                    repoRoot.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-logicflow-editor/dist/static/js/app.js")
                 ),
                 assetUri(
                     "$RESOURCE_ROOT/editor-bundles/approval-workflow/static/js/app.js",
-                    repoRoot.resolve("frontends/web/ouroboros-approval-workflow-designer/dist/static/js/app.js")
+                    repoRoot.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-approval-workflow-designer/dist/static/js/app.js")
                 )
             ),
             editorBundleStyleUris = listOf(
                 assetUri(
                     "$RESOURCE_ROOT/editor-bundles/logicflow/static/css/app.css",
-                    repoRoot.resolve("frontends/web/ouroboros-logicflow-editor/dist/static/css/app.css")
+                    repoRoot.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-logicflow-editor/dist/static/css/app.css")
                 ),
                 assetUri(
                     "$RESOURCE_ROOT/editor-bundles/approval-workflow/static/css/app.css",
-                    repoRoot.resolve("frontends/web/ouroboros-approval-workflow-designer/dist/static/css/app.css")
+                    repoRoot.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-approval-workflow-designer/dist/static/css/app.css")
                 )
             ),
             amisSdkScriptUri = assetUri(
@@ -132,7 +132,7 @@ object MetadataEditorAssets {
             ),
             xlsxRuntimeScriptUri = assetUri(
                 "ouroboros-metadata-editor/xlsx/xlsx.full.min.js",
-                repoRoot.resolve("frontends/web/node_modules/xlsx/dist/xlsx.full.min.js")
+                repoRoot.resolve("common/xlsx-runtime/xlsx.full.min.js")
             )
         )
     }

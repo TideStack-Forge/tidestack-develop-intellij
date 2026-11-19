@@ -3,6 +3,15 @@
     <name>TideStack Develop</name>
     <vendor>TideStack</vendor>
 
+    <change-notes><![CDATA[
+        <h3>0.3.1</h3>
+        <ul>
+            <li>Keep code editors usable when language services are unavailable, while reporting service errors during explicit validation.</li>
+            <li>Prevent late language service failures from clearing a newer adapter or reviving a disposed editor.</li>
+            <li>Validate metadata with the complete public schemas, including nested fields.</li>
+        </ul>
+    ]]></change-notes>
+
     <description><![CDATA[
         <p>
             <strong>TideStack Develop</strong> connects IntelliJ IDEA with the TideStack development platform.

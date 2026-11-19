@@ -17,6 +17,7 @@ data class MetadataContributionDefinition(
     val editorKind: String = "form",
     val editorKinds: List<String> = emptyList(),
     val jsonSchema: JsonObject = JsonObject(),
+    val legacyJsonSchema: JsonObject? = null,
     val editorSchema: JsonElement = JsonObject(),
     val fileTemplate: MetadataFileTemplateDefinition? = null
 )
@@ -50,6 +51,9 @@ object MetadataContributionRegistry {
     val all: List<MetadataContributionDefinition>
         get() = manifest.types
 
+    val schemas: List<JsonObject>
+        get() = manifest.schemas
+
     fun byType(type: String?): MetadataContributionDefinition? {
         if (type == null) {
             return null
@@ -79,6 +83,7 @@ object MetadataContributionRegistry {
     }
 
     private data class MetadataContributionManifest(
-        val types: List<MetadataContributionDefinition> = emptyList()
+        val types: List<MetadataContributionDefinition> = emptyList(),
+        val schemas: List<JsonObject> = emptyList()
     )
 }

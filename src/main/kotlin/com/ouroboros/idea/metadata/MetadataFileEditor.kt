@@ -41,6 +41,9 @@ class MetadataFileEditor(
     private var fallbackEditor: Editor? = null
     private var browser: JBCefBrowser? = null
     private var saveQuery: JBCefJSQuery? = null
+    private var serviceQuery: JBCefJSQuery? = null
+    private val service = runCatching { project.basePath?.let { EditorServiceClient.load(it, file.path) } }
+    @Volatile private var disposed = false
     private var readyQuery: JBCefJSQuery? = null
     private var diagnosticsLabel: JLabel? = null
     private var lastModified = false
@@ -57,6 +60,27 @@ class MetadataFileEditor(
             val jcefBrowser = JBCefBrowser()
             val save = JBCefJSQuery.create(jcefBrowser as JBCefBrowserBase)
             val ready = JBCefJSQuery.create(jcefBrowser as JBCefBrowserBase)
+            val online = JBCefJSQuery.create(jcefBrowser as JBCefBrowserBase)
+            online.addHandler { raw ->
+                ApplicationManager.getApplication().executeOnPooledThread {
+                    val envelope = gson.fromJson(raw, com.google.gson.JsonObject::class.java)
+                    val id = envelope.get("requestId").asString
+                    val result = runCatching {
+                        val client = service.getOrThrow() ?: error("Configure an editor service in .tidestack/develop.json")
+                        client.request(envelope.getAsJsonObject("request"))
+                    }
+                    val response = result.fold(
+                        { mapOf("ok" to true, "result" to it) },
+                        { mapOf("ok" to false, "error" to (it.message ?: "Editor service request failed")) }
+                    )
+                    ApplicationManager.getApplication().invokeLater {
+                        if (!disposed) jcefBrowser.cefBrowser.executeJavaScript(
+                            "window.OuroborosEditorServiceComplete(${gson.toJson(id)}, ${gson.toJson(response)});", jcefBrowser.cefBrowser.url, 0)
+                    }
+                }
+                JBCefJSQuery.Response("{}")
+            }
+            serviceQuery = online
             save.addHandler { request -> handleSave(document, request) }
             ready.addHandler { handleReady(document) }
             saveQuery = save
@@ -74,6 +98,8 @@ class MetadataFileEditor(
                         "function(response) { resolve(JSON.parse(response)); }",
                         "function(code, message) { const error = new Error(message); error.code = code === 409 ? 'revision-conflict' : 'host-save'; reject(error); }"
                     ),
+                    serviceAppName = service.getOrNull()?.appName,
+                    serviceScript = online.inject("JSON.stringify({requestId, request})", "function() {}", "function(code, message) { reject(new Error(message)); }"),
                     readyScript = ready.inject(
                         "''",
                         "function() {}",
@@ -124,6 +150,9 @@ class MetadataFileEditor(
     override fun getCurrentLocation(): FileEditorLocation? = null
 
     override fun dispose() {
+        disposed = true
+        service.getOrNull()?.close()
+        serviceQuery?.dispose()
         fallbackEditor?.let { EditorFactory.getInstance().releaseEditor(it) }
         saveQuery?.dispose()
         readyQuery?.dispose()

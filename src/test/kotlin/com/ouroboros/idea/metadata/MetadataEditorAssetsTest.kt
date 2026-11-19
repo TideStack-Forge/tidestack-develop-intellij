@@ -58,10 +58,10 @@ class MetadataEditorAssetsTest {
         assertTrue(uris.runtimeScriptUri.endsWith("/common/metadata-editor-runtime/runtime/metadata-editor-runtime.js"))
         assertTrue(uris.amisSdkScriptUri.endsWith("/common/amis-sdk/sdk.js"))
         assertTrue(uris.amisDarkThemeCssUri.endsWith("/common/amis-sdk/dark.css"))
-        assertTrue(uris.editorIntegrationScriptUri!!.endsWith("/ide-plugins/common/metadata-editor-schema/dist/editor-integrations/metadata-editor-integrations.js"))
+        assertTrue(uris.editorIntegrationScriptUri!!.endsWith("/common/metadata-editor-schema/dist/editor-integrations/metadata-editor-integrations.js"))
         assertTrue(uris.editorBundleScriptUris.any { it.endsWith("/frontends/web/ouroboros-logicflow-editor/dist/static/js/app.js") })
         assertTrue(uris.editorBundleStyleUris.any { it.endsWith("/frontends/web/ouroboros-approval-workflow-designer/dist/static/css/app.css") })
-        assertTrue(uris.xlsxRuntimeScriptUri.endsWith("/frontends/web/node_modules/xlsx/dist/xlsx.full.min.js"))
+        assertTrue(uris.xlsxRuntimeScriptUri.endsWith("/common/xlsx-runtime/xlsx.full.min.js"))
     }
 
     @Test
@@ -108,16 +108,16 @@ class MetadataEditorAssetsTest {
         write(root.resolve("common/metadata-editor-runtime/runtime/metadata-editor-amis-editor.js"))
         write(root.resolve("common/metadata-editor-runtime/runtime/metadata-editor-amis-editor.css"))
         write(root.resolve("common/metadata-editor-runtime/dist/browser/metadata-editor-host.js"))
-        write(root.resolve("ide-plugins/common/metadata-editor-schema/dist/editor-integrations/metadata-editor-integrations.js"))
-        write(root.resolve("frontends/web/ouroboros-logicflow-editor/dist/static/js/app.js"))
-        write(root.resolve("frontends/web/ouroboros-logicflow-editor/dist/static/css/app.css"))
-        write(root.resolve("frontends/web/ouroboros-approval-workflow-designer/dist/static/js/app.js"))
-        write(root.resolve("frontends/web/ouroboros-approval-workflow-designer/dist/static/css/app.css"))
+        write(root.resolve("common/metadata-editor-schema/dist/editor-integrations/metadata-editor-integrations.js"))
+        write(root.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-logicflow-editor/dist/static/js/app.js"))
+        write(root.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-logicflow-editor/dist/static/css/app.css"))
+        write(root.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-approval-workflow-designer/dist/static/js/app.js"))
+        write(root.resolve("common/metadata-editor-runtime/vendor/frontends/web/ouroboros-approval-workflow-designer/dist/static/css/app.css"))
         write(root.resolve("common/amis-sdk/sdk.js"))
         write(root.resolve("common/amis-sdk/sdk.css"))
         write(root.resolve("common/amis-sdk/cxd.css"))
         write(root.resolve("common/amis-sdk/dark.css"))
-        write(root.resolve("frontends/web/node_modules/xlsx/dist/xlsx.full.min.js"))
+        write(root.resolve("common/xlsx-runtime/xlsx.full.min.js"))
     }
 
     private fun write(path: Path) {

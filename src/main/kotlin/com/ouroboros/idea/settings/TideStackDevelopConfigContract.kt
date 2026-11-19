@@ -7,7 +7,8 @@ internal data class TideStackDevelopConfigSectionContract(
     val path: String = "",
     val fields: List<String> = emptyList(),
     val legacyAliases: Map<String, List<String>> = emptyMap(),
-    val removedFields: List<String> = emptyList()
+    val removedFields: List<String> = emptyList(),
+    val optionalFields: List<String> = emptyList()
 )
 
 internal data class TideStackDevelopConfigContract(

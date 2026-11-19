@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.ouroboros"
-version = "0.2.0"
+version = "0.3.1"
 
 val metadataRuntimeDir = file("common/metadata-editor-runtime/runtime")
 val metadataEditorRuntimeDir = file("common/metadata-editor-runtime")
@@ -17,7 +17,7 @@ val metadataEditorAssets = JsonSlurper().parse(metadataEditorAssetManifest) as M
 val metadataHostRuntime = file("common/metadata-editor-runtime/dist/browser/metadata-editor-host.js")
 val tideStackI18nDir = file("common/metadata-editor-schema/dist/i18n")
 val amisSdkDir = file("common/amis-sdk")
-val xlsxRuntimeDir = file("../../frontends/web/node_modules/xlsx/dist")
+val xlsxRuntimeDir = file("common/xlsx-runtime")
 fun metadataEditorAssetList(key: String): List<String> {
     return (metadataEditorAssets[key] as? List<*>)?.map { it.toString() } ?: emptyList()
 }
@@ -29,7 +29,7 @@ val metadataRuntimeAssets = metadataEditorAssetList("runtimeFiles").map(metadata
 val metadataSchemaAssets = metadataEditorAssetList("schemaFiles").map { file("common/metadata-editor-schema/dist/$it") }
 val metadataEditorIntegrationAssets = metadataEditorAssetList("editorIntegrationFiles").map { file("common/metadata-editor-schema/dist/$it") }
 val metadataEditorBundleAssets = metadataEditorBundleDefinitions.flatMap { bundle ->
-    val sourceRoot = file("../..").resolve(bundle["sourceRoot"].toString())
+    val sourceRoot = file("common/metadata-editor-runtime/vendor").resolve(bundle["sourceRoot"].toString())
     (bundle["requiredFiles"] as? List<*>)?.map { sourceRoot.resolve(it.toString()) } ?: emptyList()
 }
 val tideStackDevelopConfigContracts = metadataEditorAssetList("contractFiles").map { file("common/contracts/$it") }
@@ -48,8 +48,14 @@ repositories {
 dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.networknt:json-schema-validator:3.0.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.9.3")
+}
+
+sourceSets.test {
+    resources.srcDir(metadataEditorSchemaDir.resolve("tests/fixtures"))
 }
 
 intellij {
@@ -68,11 +74,11 @@ tasks {
             include("src/**", "package.json", "tsconfig*.json", "vite.browser-host.config.ts", "vite.amis-editor.config.ts", "scripts/**")
         })
         inputs.files(fileTree(metadataEditorSchemaDir) {
-            include("metadata-types/**", "metadata-editors/**", "editor-schemas/**", "i18n/**", "tidestackDevelopCapabilities.json", "package.json", "scripts/**")
+            include("metadata-types/**", "schemas/**", "metadata-editors/**", "editor-schemas/**", "i18n/**", "tidestackDevelopCapabilities.json", "package.json", "scripts/**")
             include("metadataCreationContract.json", "metadataCreationCases.json", "metadataEditorAssets.json")
         })
         metadataEditorBundleDefinitions.forEach { bundle ->
-            inputs.files(fileTree(file("../..").resolve(bundle["sourceRoot"].toString()).parentFile) {
+            inputs.files(fileTree(file("common/metadata-editor-runtime/vendor").resolve(bundle["sourceRoot"].toString()).parentFile) {
                 include("src/**", "public/**", "package.json", "webpack.config.js", "babel.config.js")
             })
         }
@@ -116,6 +122,16 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform()
+        inputs.file("testing/common/fixtures/data/ide-metadata-workspace/documents.json")
+        inputs.file(metadataEditorSchemaDir.resolve("tests/fixtures/metadata-schema-conformance.json"))
+        if (!providers.gradleProperty("metadataJcef").isPresent) {
+            outputs.dir("build/ide-metadata-fixture/intellij")
+            exclude("**/MetadataJcefSmokeTest*")
+        } else {
+            systemProperty("java.awt.headless", "false")
+            systemProperty("ide.browser.jcef.enabled", "true")
+            systemProperty("ide.browser.jcef.testMode.enabled", "true")
+        }
     }
 
     patchPluginXml {
@@ -141,7 +157,7 @@ tasks {
             }
         }
         metadataEditorBundleDefinitions.forEach { bundle ->
-            from(file("../..").resolve(bundle["sourceRoot"].toString())) {
+            from(file("common/metadata-editor-runtime/vendor").resolve(bundle["sourceRoot"].toString())) {
                 into("ouroboros-metadata-editor/${bundle["targetRoot"]}")
             }
         }

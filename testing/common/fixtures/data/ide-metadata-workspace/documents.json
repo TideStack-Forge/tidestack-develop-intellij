@@ -1,0 +1,307 @@
+{
+  "page": {
+    "fileName": "page.ui-schema.json",
+    "metadataType": "ui-schema",
+    "value": {
+      "name": "Fixture.Page",
+      "title": "Page metadata",
+      "custom": {
+        "keep": [
+          1,
+          2
+        ]
+      },
+      "schema": {
+        "type": "page",
+        "title": "Page fixture",
+        "body": [
+          {
+            "type": "tpl",
+            "tpl": "Hello"
+          }
+        ],
+        "customProperty": {
+          "preserved": true
+        }
+      }
+    }
+  },
+  "form": {
+    "fileName": "form.ui-schema.json",
+    "metadataType": "ui-schema",
+    "value": {
+      "type": "form",
+      "title": "Form fixture",
+      "body": [
+        {
+          "type": "input-text",
+          "name": "message",
+          "label": "Message"
+        }
+      ],
+      "customProperty": {
+        "preserved": true
+      }
+    }
+  },
+  "inlinePopup": {
+    "fileName": "inline.ui-schema.json",
+    "metadataType": "ui-schema",
+    "value": {
+      "type": "page",
+      "title": "Popup fixture",
+      "body": [
+        {
+          "type": "button",
+          "label": "Open popup",
+          "actionType": "dialog",
+          "dialog": {
+            "title": "Inline popup",
+            "body": [
+              {
+                "type": "tpl",
+                "tpl": "Body"
+              }
+            ]
+          }
+        },
+        {
+          "type": "button",
+          "label": "Other popup",
+          "actionType": "dialog",
+          "dialog": {
+            "title": "Other popup",
+            "body": [
+              {
+                "type": "tpl",
+                "tpl": "Other body"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "sharedPopup": {
+    "fileName": "shared.ui-schema.json",
+    "metadataType": "ui-schema",
+    "value": {
+      "type": "page",
+      "title": "Popup fixture",
+      "body": [
+        {
+          "type": "button",
+          "label": "Open popup",
+          "actionType": "dialog",
+          "dialog": {
+            "$ref": "shared"
+          }
+        },
+        {
+          "type": "button",
+          "label": "Other popup",
+          "actionType": "dialog",
+          "dialog": {
+            "$ref": "shared"
+          }
+        }
+      ],
+      "definitions": {
+        "shared": {
+          "type": "dialog",
+          "title": "Shared popup",
+          "body": [
+            {
+              "type": "tpl",
+              "tpl": "Body"
+            }
+          ]
+        },
+        "authored": {
+          "type": "tpl",
+          "tpl": "Keep this unused definition"
+        }
+      }
+    }
+  },
+  "business": {
+    "fileName": "fixture.business.json",
+    "metadataType": "business",
+    "value": {
+      "modelType": "default",
+      "name": "Fixture",
+      "fullName": "Fixture",
+      "title": "Business fixture",
+      "isEnabled": true,
+      "fields": [
+        {
+          "name": "id",
+          "title": "ID",
+          "type": "string",
+          "isPrimaryKey": true
+        }
+      ],
+      "relations": [],
+      "apis": {
+        "search": {
+          "isEnabled": true,
+          "isAuto": true,
+          "order": {
+            "field": "id"
+          },
+          "beforeScriptLanguage": "groovy",
+          "beforeScript": "return input",
+          "afterScriptLanguage": "javascript",
+          "afterScript": "return result"
+        },
+        "getOne": {
+          "isEnabled": true,
+          "isAuto": true,
+          "beforeScriptLanguage": "groovy",
+          "beforeScript": "return input",
+          "afterScriptLanguage": "javascript",
+          "afterScript": "return result"
+        },
+        "add": {
+          "isEnabled": true,
+          "isAuto": true,
+          "beforeScriptLanguage": "groovy",
+          "beforeScript": "return input",
+          "afterScriptLanguage": "javascript",
+          "afterScript": "return result"
+        },
+        "update": {
+          "isEnabled": true,
+          "isAuto": true,
+          "beforeScriptLanguage": "groovy",
+          "beforeScript": "return input",
+          "afterScriptLanguage": "javascript",
+          "afterScript": "return result"
+        },
+        "delete": {
+          "isEnabled": true,
+          "isAuto": true,
+          "beforeScriptLanguage": "groovy",
+          "beforeScript": "return input",
+          "afterScriptLanguage": "javascript",
+          "afterScript": "return result"
+        }
+      },
+      "custom": {
+        "keep": true
+      }
+    }
+  },
+  "menu": {
+    "fileName": "menu.menu.json",
+    "metadataType": "menu",
+    "value": {
+      "name": "fixture",
+      "title": "Menu fixture",
+      "custom": {
+        "keep": true
+      }
+    }
+  },
+  "logicflow": {
+    "fileName": "fixture.logicflow.json",
+    "metadataType": "logicflow",
+    "value": {
+      "name": "logicflow-editor-integration",
+      "description": "logicflow editor integration fixture",
+      "entryNode": "入口节点",
+      "exitNode": "",
+      "errorEntryNode": "",
+      "isEnabled": true,
+      "inputDataType": "any",
+      "outputDataType": "any",
+      "nodes": [
+        {
+          "type": "const",
+          "dataType": "string",
+          "value": "hello",
+          "name": "入口节点",
+          "inputPorts": [],
+          "outputPorts": [
+            {
+              "name": "next",
+              "description": "",
+              "dataType": "any"
+            }
+          ],
+          "isEnabled": true,
+          "isAsync": false
+        },
+        {
+          "type": "script",
+          "name": "脚本节点",
+          "inputPorts": [
+            {
+              "name": "input",
+              "description": "",
+              "dataType": "any"
+            }
+          ],
+          "outputPorts": [
+            {
+              "name": "next",
+              "description": "",
+              "dataType": "any"
+            }
+          ],
+          "isEnabled": true,
+          "isAsync": false,
+          "language": "groovy",
+          "script": "return input"
+        },
+        {
+          "type": "return",
+          "name": "返回节点",
+          "inputPorts": [
+            {
+              "name": "input",
+              "description": "",
+              "dataType": "any"
+            }
+          ],
+          "outputPorts": [],
+          "isEnabled": true,
+          "isAsync": false
+        }
+      ],
+      "connections": [
+        {
+          "sourceNode": "入口节点",
+          "sourceOutputPort": 0,
+          "targetNode": "脚本节点",
+          "targetInputPort": 0
+        },
+        {
+          "sourceNode": "脚本节点",
+          "sourceOutputPort": 0,
+          "targetNode": "返回节点",
+          "targetInputPort": 0
+        }
+      ],
+      "custom": {
+        "keep": [
+          "unknown-field"
+        ]
+      },
+      "nodePositions": {
+        "入口节点": {
+          "x": 100,
+          "y": 200
+        },
+        "脚本节点": {
+          "x": 380,
+          "y": 200
+        },
+        "返回节点": {
+          "x": 660,
+          "y": 200
+        }
+      }
+    }
+  }
+}

@@ -25,6 +25,7 @@ class MetadataFileTemplateServiceTest {
             "example.business.json",
             "example.logicflow.json",
             "example.workflow.json",
+            "example.approval-form.json",
             "example.field-type.json",
             "example.flow-node.json",
             "example.widget.json",

@@ -3,8 +3,37 @@ package com.ouroboros.idea.metadata
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.api.DynamicTest
+import com.google.gson.JsonParser
 
 class MetadataSchemaDiagnosticsTest {
+    @TestFactory
+    fun `public metadata schema conformance`(): List<DynamicTest> {
+        val fixtures = requireNotNull(javaClass.classLoader.getResource("metadata-schema-conformance.json"))
+        return JsonParser.parseString(fixtures.readText()).asJsonArray
+            .filter { it.asJsonObject.get("type").asString != "ui-schema-content" }
+            .map { element ->
+                val example = element.asJsonObject
+                DynamicTest.dynamicTest(example.get("id").asString) {
+                    val contribution = requireNotNull(MetadataContributionRegistry.byType(example.get("type").asString))
+                    val path = example.get("path")?.asString
+                        ?: "/repo/src/main/metadata/${contribution.fixedFileName ?: "probe${contribution.fileSuffix}"}"
+                    val diagnostics = MetadataSchemaDiagnostics.validate(path, example.get("document").toString())
+                    assertEquals(!example.get("valid").asBoolean,
+                        diagnostics.any { it.severity == MetadataSchemaDiagnosticSeverity.ERROR }, diagnostics.toString())
+                }
+            }
+    }
+
+    @Test
+    fun `malformed and incomplete JSON is diagnosed without throwing`() {
+        for (text in listOf("{", "", " ", "{unquoted:true}", "{\"fullName\":\"orders\",\"title\":\"Orders\"}{}")) {
+            val diagnostics = MetadataSchemaDiagnostics.validate("/repo/src/main/metadata/orders.menu.json", text)
+            assertEquals("invalid-json", diagnostics.single().code, text)
+        }
+    }
+
     @Test
     fun `valid JSON in a matching metadata path has no diagnostics`() {
         val diagnostics = MetadataSchemaDiagnostics.validate(
@@ -34,8 +63,8 @@ class MetadataSchemaDiagnosticsTest {
         )
 
         assertEquals(
-            listOf("schema-required-property", "schema-property-type", "schema-enum-value"),
-            diagnostics.map { it.code }
+            listOf("schema-required-property", "schema-property-type", "schema-enum-value").sorted(),
+            diagnostics.map { it.code }.sorted()
         )
     }
 
@@ -56,7 +85,7 @@ class MetadataSchemaDiagnosticsTest {
 
         assertEquals(listOf("schema-property-type"), menuDiagnostics.map { it.code })
         assertEquals(listOf("schema-property-type"), authorityDiagnostics.map { it.code })
-        assertEquals(listOf("schema-enum-value", "schema-required-property"), devMenuDiagnostics.map { it.code })
+        assertEquals(listOf("schema-enum-value", "schema-required-property").sorted(), devMenuDiagnostics.map { it.code }.sorted())
     }
 
     @Test
@@ -70,7 +99,7 @@ class MetadataSchemaDiagnosticsTest {
             "[{\"key\":\"platform.enabled\",\"label\":\"Enabled\",\"valueType\":\"unknown\"}]"
         )
 
-        assertEquals(listOf("schema-required-property", "schema-property-type"), appModuleDiagnostics.map { it.code })
+        assertEquals(listOf("schema-required-property", "schema-property-type").sorted(), appModuleDiagnostics.map { it.code }.sorted())
         assertEquals(listOf("schema-enum-value"), configurationDiagnostics.map { it.code })
     }
 }

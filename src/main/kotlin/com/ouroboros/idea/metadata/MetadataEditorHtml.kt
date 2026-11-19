@@ -9,7 +9,9 @@ object MetadataEditorHtml {
         initialTheme: String,
         locale: String,
         saveScript: String,
-        readyScript: String
+        readyScript: String,
+        serviceAppName: String? = null,
+        serviceScript: String = "reject(new Error('Editor service is not configured'));"
     ): String {
         val hostScript = """
             const logicalHost = window.OuroborosMetadataEditorHostCore.createBrowserMetadataEditorHost({
@@ -19,7 +21,22 @@ object MetadataEditorHtml {
               initialDocument: ${escapeScriptJson(initialDocumentJson)},
               saveText: (text, revision) => new Promise((resolve, reject) => { $saveScript })
             });
+            const servicePending = new Map();
+            let serviceSequence = 0;
+            window.OuroborosEditorServiceComplete = (id, payload) => {
+              const pending = servicePending.get(id);
+              if (!pending) return;
+              servicePending.delete(id); clearTimeout(pending.timeout);
+              if (payload.ok) pending.resolve(payload.result); else pending.reject(new Error(payload.error));
+            };
             window.OuroborosMetadataEditorHost = {
+              service: ${serviceAppName?.let { "{appName: " + escapeScriptString(it) + "}" } ?: "null"},
+              requestService: request => new Promise((resolve, reject) => {
+                const requestId = String(++serviceSequence);
+                const timeout = setTimeout(() => { servicePending.delete(requestId); reject(new Error('Editor host request timed out')); }, 130000);
+                servicePending.set(requestId, {resolve, reject, timeout});
+                $serviceScript
+              }),
               initialize: () => logicalHost.loadState(),
               theme: ${escapeScriptString(initialTheme)},
               locale: ${escapeScriptString(locale)},
@@ -53,13 +70,8 @@ object MetadataEditorHtml {
                 "<link rel=\"stylesheet\" href=\"${escapeAttr(it)}\" />"
             },
             "{{RUNTIME_SCRIPT_URI}}" to escapeAttr(assets.runtimeScriptUri),
-            "{{AMIS_EDITOR_RUNTIME_SCRIPT_TAG}}" to if (schemaName == "ui-schema") {
-                assets.amisEditorRuntimeScriptUri
-                    ?.let { "<script src=\"${escapeAttr(it)}\"></script>" }
-                    .orEmpty()
-            } else {
-                ""
-            },
+            "{{AMIS_EDITOR_RUNTIME_SCRIPT_TAG}}" to assets.amisEditorRuntimeScriptUri
+                ?.let { "<script src=\"${escapeAttr(it)}\"></script>" }.orEmpty(),
             "{{REACT_GLOBALS_SCRIPT_TAG}}" to reactGlobalsScriptTag(),
             "{{EDITOR_INTEGRATION_SCRIPT_TAG}}" to assets.editorIntegrationScriptUri
                 ?.let { "<script src=\"${escapeAttr(it)}\"></script>" }
