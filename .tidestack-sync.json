@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "managedBy": "scripts/open-source/sync-ide-plugins.mjs",
   "sourceRepository": "ouroboros",
-  "sourceCommit": "086f8d9861d896d9089c72a48a2694c7aa537d32",
+  "sourceCommit": "b82e2ef61e7d4bbb65ec8ba95637a83803cd5d83",
   "sourceManagedContentHash": "ecc253cb145f56e59a75827e5e70daecc3e86f3d204e9200f32d1366ecae3a0c",
   "targetRepository": "intellij",
   "managedPaths": [
@@ -15,6 +15,6 @@
     "testing/common/fixtures/data/ide-metadata-workspace"
   ],
   "submodules": {
-    "common": "16b27ee28039f308bf1eeae04153da44b74b4d96"
+    "common": "99b4c4b7136b07a29b35094c8eb0d4139ad005d6"
   }
 }
